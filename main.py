@@ -1,32 +1,8 @@
 import tkinter as tk
 from tkinter import Toplevel, messagebox
+from employeeScreen import open_employee_screen
 
 # Hàm để mở các màn hình chức năng khác
-def open_employee_screen():
-    screen1 = Toplevel(root)
-    screen1.title("Employee Management")
-    screen1.geometry("700x500")
-
-    # Lấy kích thước của màn hình máy tính
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
-
-    # Lấy kích thước cửa sổ con
-    screen1_width = 700
-    screen1_height = 500
-
-    # Tính toán tọa độ x và y của cửa sổ con để căn giữa màn hình
-    screen1_x = (screen_width - screen1_width) // 2
-    screen1_y = (screen_height - screen1_height) // 2
-
-    # Cập nhật vị trí cửa sổ con
-    screen1.geometry(f'{screen1_width}x{screen1_height}+{screen1_x}+{screen1_y}')
-
-    label1 = tk.Label(screen1, text="Đây là Màn Hình Employee Management", font=("Arial", 14))
-    label1.pack(pady=50)
-    button_close1 = tk.Button(screen1, text="Đóng", command=screen1.destroy)
-    button_close1.pack(pady=10)
-
 def open_task_screen():
     screen2 = Toplevel(root)
     screen2.title("Task Management")
@@ -91,7 +67,7 @@ menu_bar = tk.Menu(root, bg="#333", fg="#fff", font=("Arial", 12))
 
 # Tạo menu cho các màn hình
 function_menu = tk.Menu(menu_bar, tearoff=0)
-function_menu.add_command(label=txtEmpScreen, command=open_employee_screen)
+function_menu.add_command(label=txtEmpScreen, command=lambda:open_employee_screen(root))
 function_menu.add_command(label=txtTaskScreen, command=open_task_screen)
 function_menu.add_command(label=txtSalaryScreen, command=open_salary_screen)
 
@@ -110,7 +86,7 @@ frame_left = tk.Frame(root, bg="#2c3e50", width=150, height=400)
 frame_left.pack(side="left", fill="y")
 
 # Thêm các nút vào frame bên trái
-button1 = tk.Button(frame_left, text=txtEmpScreen, command=open_employee_screen, width=20, bg="green", fg="#fff", font=("Arial", 12))
+button1 = tk.Button(frame_left, text=txtEmpScreen, command=lambda: open_employee_screen(root), width=20, bg="green", fg="#fff", font=("Arial", 12))
 button1.pack(pady=20)
 
 button2 = tk.Button(frame_left, text=txtTaskScreen, command=open_task_screen, width=20, bg="green", fg="#fff", font=("Arial", 12))
