@@ -100,10 +100,10 @@ def open_department_screen(root):
 
     # Label và Entry for DepartmentID
     label_department_id = tk.Label(frame_department, text="Department ID:", font=("Arial", 12), bg="#ecf0f1")
-    label_department_id.grid(row=1, column=0, sticky="w", padx=5)
+    label_department_id.grid(row=1, column=0, sticky="w")
 
     entry_department_id = tk.Entry(frame_department, font=("Arial", 12), width=8, relief="groove")
-    entry_department_id.grid(row=1, column=1, pady=5, padx=5)
+    entry_department_id.grid(row=1, column=1, padx=5)
 
     # Label và Entry cho tên phòng ban
     label_department_name = tk.Label(frame_department, text="Department Name:", font=("Arial", 12), bg="#ecf0f1")
@@ -122,12 +122,12 @@ def open_department_screen(root):
     #Button Add
     button_add = tk.Button(frame_department, text="Add", font=("Arial", 12), bg="#27ae60", fg="white", bd=2, activebackground="blue",
                    activeforeground="white", highlightthickness=7, relief="raised", command=add_department, cursor="hand2",justify="right")
-    button_add.grid(row=1, column=6, sticky="e")
+    button_add.grid(row=1, column=8, sticky="e")
 
     # Listbox để hiển thị các phòng ban
     listbox_departments = tk.Listbox(frame_department, font=("Arial", 12), selectmode=tk.SINGLE, relief="solid",
                                      bg="#ccffff")
-    listbox_departments.grid(row=2, column=0, columnspan=8, pady=10, sticky="ew", padx=5)
+    listbox_departments.grid(row=2, column=0, columnspan=10, sticky="ew", pady=5)
 
     # Các nút chức năng
     button_edit = tk.Button(frame_department, text="Edit", font=("Arial", 12), bg="#efc497", fg="white", bd=2, activebackground="blue",
@@ -136,7 +136,7 @@ def open_department_screen(root):
 
     button_delete = tk.Button(frame_department, text="Delete", font=("Arial", 12), bg="#f3a0a0", fg="white", bd=2, activebackground="blue",
                    activeforeground="white", highlightthickness=7, relief="raised",cursor="hand2",justify="right", command=delete_department)
-    button_delete.grid(row=3, column=6, sticky="e")
+    button_delete.grid(row=3, column=8, sticky="e")
 
     return frame_department
 
