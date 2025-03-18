@@ -6,5 +6,5 @@ def open_employee_screen(root):
     frame.pack(padx=3, pady=3, fill="both", expand=True, )
     # Tiêu đề
     label_title = tk.Label(frame, text="Employee Management", font=("Arial", 16, "bold"))
-    label_title.grid(row=0, column=0, columnspan=2, pady=10)
+    label_title.grid(row=0, column=0, columnspan=2, sticky="w")
     return frame
