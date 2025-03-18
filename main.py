@@ -63,8 +63,5 @@ def show_screen(menu):
     elif menu == txtRoleScreen:
         isFrameOpen = open_role_screen(root)
 
-
-
-
 # Hiển thị cửa sổ
 root.mainloop()
