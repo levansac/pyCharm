@@ -16,7 +16,7 @@ root.configure(bg="#f0f0f0")  # Màu nền cửa sổ chính
 txtEmpScreen ="Employee Management"
 txtDepartmentScreen ="Department Management"
 txtRoleScreen ="Role Management"
-txtApplication ="ỨNG DỤNG QUẢN LÝ NHÂN SỰ"
+txtApplication ="HUMAN RESOURCE MANAGEMENT APPLICATION"
 # Biến toàn cục để lưu Frame Department
 isFrameOpen = None
 # Thêm một nút để đóng ứng dụng
