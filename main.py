@@ -4,13 +4,28 @@ from employeeScreen import open_employee_screen
 from roleScreen import open_role_screen
 from departmentScreen import open_department_screen
 
+# Function to center the window on the screen
+def center_window(window, width, height):
+    # Get the screen width and height
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    # Calculate the position to center the window
+    position_top = int(screen_height / 2 - height / 2)
+    position_right = int(screen_width / 2 - width / 2)
+
+    # Set the window geometry (position + width x height)
+    window.geometry(f'{width}x{height}+{position_right}+{position_top}')
+
 # Tạo cửa sổ chính
 root = tk.Tk()
 root.title("HR Application")
-# Mở cửa sổ ở chế độ toàn màn hình
-root.attributes("-fullscreen", True)
-root.geometry("1100x700")
 root.configure(bg="#f0f0f0")  # Màu nền cửa sổ chính
+# Set the desired width and height for the window
+window_width = 1300
+window_height = 700
+# Center the window
+center_window(root, window_width, window_height)
 
 #Khai báo biến ở đây
 txtEmpScreen ="Employee Management"
@@ -19,22 +34,6 @@ txtRoleScreen ="Role Management"
 txtApplication ="HUMAN RESOURCE MANAGEMENT APPLICATION"
 # Biến toàn cục để lưu Frame Department
 isFrameOpen = None
-# Thêm một nút để đóng ứng dụng
-def close_app():
-    if messagebox.askokcancel("Thoát", "Bạn có muốn thoát ứng dụng?"):
-        root.quit()
-
-# Tạo một Frame cho button_exit
-frame_exit = tk.Frame(root, bg="#f0f0f0")  # Background giống cửa sổ chính
-frame_exit.pack(side="top", anchor="ne", padx=0, pady=2, fill="x")
-
-# Tạo button_exit
-button_exit = tk.Button(frame_exit, text="Thoát", command=close_app, bg="#ff6347", font=("Arial", 12, "bold"))
-button_exit.pack(side="right")
-
-# Thêm tiêu đề vào frame_title (ở chính giữa)
-label_title = tk.Label(frame_exit, text=txtApplication, font=("Arial", 16, "bold"), bg="#f0f0f0")
-label_title.pack()
 
 # Tạo một frame bên trái để chứa các nút
 frame_left = tk.Frame(root, bg="#2c3e50", width=150, height=400)

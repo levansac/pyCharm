@@ -9,7 +9,7 @@ session = cluster.connect('cassandrakeyspace')  # Replace with your keyspace nam
 for i in range(1, 10001):
     session.execute(
         """
-        INSERT INTO DEPARTMENT (Id, DepartmentId, DepartmentName, Descriptions)
+        INSERT INTO DEPARTMENT (Id, DepartmentCode, DepartmentName, Descriptions)
         VALUES (%s, %s, %s, %s)
         """,
         (uuid4(), f'D{i}', f'Department {i}', f'Description for department {i}')
