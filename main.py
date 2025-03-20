@@ -31,7 +31,6 @@ center_window(root, window_width, window_height)
 txtEmpScreen ="Employee Management"
 txtDepartmentScreen ="Department Management"
 txtRoleScreen ="Role Management"
-txtApplication ="HUMAN RESOURCE MANAGEMENT APPLICATION"
 # Biến toàn cục để lưu Frame Department
 isFrameOpen = None
 

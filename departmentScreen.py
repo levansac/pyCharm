@@ -3,78 +3,68 @@ from tkinter import messagebox
 from tkinter import ttk
 import uuid
 from cassandra.cluster import Cluster
+from connector.cassandra_connection import CassandraDB
+
 
 def open_department_screen(root):
-    global frame_department, entry_department_code,entry_department_name, entry_description, tree, selected_item  # Biến toàn cục
+    global frame_department, entry_department_code, entry_department_name, entry_description, tree, selected_item
 
-    # Initialize selected_item to None
     selected_item = None
 
-    # Tạo một frame cho màn hình quản lý phòng ban
     frame_department = tk.Frame(root, padx=20, pady=20, bd=2, relief="solid", width=1100, height=600, bg="#ecf0f1")
-    frame_department.pack(padx=3, pady=3, fill="both", expand=True)
+    frame_department.pack(padx=3, pady=3,fill="both", expand=True)
 
-    # Tiêu đề màn hình
-    label_title = tk.Label(frame_department, text="Department Management", font=("Arial", 18, "bold"), bg="#ecf0f1")
-    label_title.grid(row=0, column=0, columnspan=4, sticky="w", pady=10)
+    label_title = tk.Label(frame_department, text="Department Management", font=("Arial", 12, "bold"), bg="#ecf0f1")
+    label_title.grid(row=0, column=0, columnspan=4, sticky="nw")
 
-    # Label và Entry for DepartmentCode
     label_department_code = tk.Label(frame_department, text="Code:", font=("Arial", 12), bg="#ecf0f1")
     label_department_code.grid(row=1, column=0, sticky="w")
-
-    entry_department_code = tk.Entry(frame_department, font=("Arial", 12), width=8, relief="groove")
-    entry_department_code.grid(row=1, column=1, padx=5)
-
-    # Label và Entry cho tên phòng ban
+    entry_department_code = tk.Entry(frame_department, font=("Arial", 12), width=15, relief="groove")
+    entry_department_code.grid(row=1,column=1,padx=5, sticky="w")
     label_department_name = tk.Label(frame_department, text="Name:", font=("Arial", 12), bg="#ecf0f1")
-    label_department_name.grid(row=1, column=2, padx=5)
+    label_department_name.grid(row=1, column=2,padx=5)
+    entry_department_name = tk.Entry(frame_department, font=("Arial", 12), width=40, relief="groove")
+    entry_department_name.grid(row=1, column=3,padx=5)
+    button_search = tk.Button(frame_department, text="Search", font=("Arial", 12), bg="#27ae60", fg="white", bd=2, activebackground="blue",
+                   activeforeground="white", highlightthickness=7, relief="raised", command=search_department, cursor="hand2", justify="right")
+    button_search.grid(row=1,column=7,padx=5)
+    button_reset = tk.Button(frame_department, text="Clear", font=("Arial", 12), bg="#27ae60", fg="white", bd=2, activebackground="blue",
+                   activeforeground="white", highlightthickness=7, relief="raised", command=showDataOnGrid, cursor="hand2", justify="right")
+    button_reset.grid(row=1, column=8, padx=5,sticky="e")
 
-    entry_department_name = tk.Entry(frame_department, font=("Arial", 12), width=30, relief="groove")
-    entry_department_name.grid(row=1, column=3, padx=5)
-
-    # Label và Entry cho mô tả
     label_description = tk.Label(frame_department, text="Descriptions:", font=("Arial", 12), bg="#ecf0f1")
-    label_description.grid(row=1, column=4, padx=5)
-
-    entry_description = tk.Entry(frame_department, font=("Arial", 12), width=40, relief="groove")
-    entry_description.grid(row=1, column=5, padx=5)
-
-    # Button Add
+    label_description.grid(row=2, column=0, sticky="w")
+    entry_description = tk.Entry(frame_department, font=("Arial", 12), width=70, relief="groove")
+    entry_description.grid(row=2, column=1, columnspan=4)
     button_add = tk.Button(frame_department, text="Add", font=("Arial", 12), bg="#27ae60", fg="white", bd=2, activebackground="blue",
                    activeforeground="white", highlightthickness=7, relief="raised", command=add_department, cursor="hand2", justify="right")
-    button_add.grid(row=1, column=8, sticky="e")
+    button_add.grid(row=2, column=8, sticky="e")
 
     # Button Edit
     button_edit = tk.Button(frame_department, text="Edit", font=("Arial", 12), bg="#efc497", fg="white", bd=2, activebackground="blue",
                    activeforeground="white", highlightthickness=7, relief="raised", cursor="hand2", justify="right", command=edit_department)
-    button_edit.grid(row=3, column=5, padx=10, sticky="e")
-
-    # Button Delete
+    button_edit.grid(row=4, column=5, padx=10, sticky="e")
     button_delete = tk.Button(frame_department, text="Delete", font=("Arial", 12), bg="#f3a0a0", fg="white", bd=2, activebackground="blue",
                    activeforeground="white", highlightthickness=7, relief="raised", cursor="hand2", justify="right", command=delete_department)
-    button_delete.grid(row=3, column=8, sticky="e")
+    button_delete.grid(row=4, column=8, sticky="e")
 
     # Function creating treeview
     creatingTreeView()
-
     return frame_department
-#
+
+
 def creatingTreeView():
     global tree, frame_department, selected_item
     # Create Treeview widget (Grid/Table)
     tree = ttk.Treeview(frame_department, show="headings")
+    tree['columns'] = ('Id', 'DepartmentCode', 'DepartmentName', 'Descriptions')
 
-    # Define the columns
-    tree['columns'] = ('DepartmentCode', 'DepartmentName', 'Descriptions')  # Adjust column names according to your data
-
-    # Define headings (column names)
-    # tree.heading('Id', text='Id')
+    tree.heading('Id', text='Id')  # Hidden column
     tree.heading('DepartmentCode', text='Code')
     tree.heading('DepartmentName', text='Name')
     tree.heading('Descriptions', text='Descriptions')
 
-    # Configure column widths
-    # tree.column('Id', width=100, anchor='center')
+    tree.column('Id', width=0, stretch=False)  # Hide the ID column
     tree.column('DepartmentCode', width=100, anchor='center')
     tree.column('DepartmentName', width=200, anchor='center')
     tree.column('Descriptions', width=300, anchor='center')
@@ -105,11 +95,11 @@ def creatingTreeView():
 
     # Add Scrollbars to Treeview
     vsb = ttk.Scrollbar(frame_department, orient="vertical", command=tree.yview)
-    vsb.grid(row=2, column=9, sticky='ns')  # Place scrollbar at the right of the Treeview
+    vsb.grid(row=3, column=9, sticky='ns')  # Place scrollbar at the right of the Treeview
     tree.configure(yscrollcommand=vsb.set)
 
     # Grid the Treeview widget
-    tree.grid(row=2, column=0, columnspan=9, sticky="nsew", pady=5)
+    tree.grid(row=3, column=0, columnspan=9, sticky="nsew", pady=5)
 
     # Configure row and column weights to make the Treeview expandable
     frame_department.grid_rowconfigure(2, weight=1)
@@ -126,147 +116,138 @@ def creatingTreeView():
     # Bind row selection event
     tree.bind("<<TreeviewSelect>>", on_item_select)
 
+
 def on_item_select(event):
     global selected_item
-    selected_item = tree.selection()[0]  # Get selected row ID
+    selected_items = tree.selection()
+
+    if not selected_items:
+        return  # No selection
+
+    selected_item = selected_items[0]
     values = tree.item(selected_item, "values")
 
-    # Populate the fields with selected values
     entry_department_code.delete(0, tk.END)
-    entry_department_code.insert(0, values[0])
+    entry_department_code.insert(0, values[1])
 
     entry_department_name.delete(0, tk.END)
-    entry_department_name.insert(0, values[1])
+    entry_department_name.insert(0, values[2])
 
     entry_description.delete(0, tk.END)
-    entry_description.insert(0, values[2])
+    entry_description.insert(0, values[3])
 
-# Hàm xử lý thao tác thêm phòng ban
+def search_department():
+    search_code = entry_department_code.get().strip().lower()
+    search_name = entry_department_name.get().strip().lower()
+
+    if not search_code or not search_name:
+        messagebox.showwarning("Search Error", "Please enter a search information.")
+        return
+
+    for item in tree.get_children():
+        tree.delete(item)
+
+    for row in fetch_data_from_cassandra():
+        if search_code in row.departmentcode.lower() or search_name in row.departmentname.lower():
+            tree.insert('', 'end', values=(str(row.id), row.departmentcode, row.departmentname, row.descriptions))
+
 def add_department():
-    department_code = entry_department_code.get()  # Get department code from the entry field
-    department_name = entry_department_name.get()  # Get department name from the entry field
-    description = entry_description.get()  # Get description from the entry field
+    department_id = uuid.uuid4()
+    department_code = entry_department_code.get().strip()
+    department_name = entry_department_name.get().strip()
+    description = entry_description.get().strip()
 
-    if department_code and department_name and description:
-        try:
-            # Connect to Cassandra
-            cluster = Cluster(['127.0.0.1'])  # Replace with your Cassandra host/IP
-            session = cluster.connect('cassandrakeyspace')  # Replace with your keyspace name
+    if not department_code or not department_name:
+        messagebox.showwarning("Input Error", "Please fill in all fields.")
+        return
 
-            # Generate a UUID for the department Id
-            department_id = uuid.uuid4()
+    try:
+        session = get_cassandra_session()
 
-            # Prepare and execute the insert query
-            query = """
-            INSERT INTO department (Id, DepartmentCode, DepartmentName, Descriptions)
-            VALUES (%s, %s, %s, %s)
-            """
+        # Check if department with same code exists
+        check_query = "SELECT COUNT(*) FROM department WHERE DepartmentCode = %s"
+        result = session.execute(check_query, (department_code,))
+        count = result.one()[0]
 
-            # Execute the query with the entered values
-            session.execute(query, (department_id, department_code, department_name, description))
+        if count > 0:
+            messagebox.showwarning("Duplicate Entry", "A department with this code already exists!")
+            return
 
-            # Clear the fields after inserting the record
-            entry_department_code.delete(0, tk.END)
-            entry_department_name.delete(0, tk.END)
-            entry_description.delete(0, tk.END)
+        insert_query = "INSERT INTO department (Id, DepartmentCode, DepartmentName, Descriptions) VALUES (%s, %s, %s, %s)"
+        session.execute(insert_query, (department_id, department_code, department_name, description))
 
-            # Show success message
-            messagebox.showinfo("Success", f"Department '{department_name}' added successfully!")
+        entry_department_code.delete(0, tk.END)
+        entry_department_name.delete(0, tk.END)
+        entry_description.delete(0, tk.END)
 
-            # Refresh Treeview (grid)
-            creatingTreeView()
+        showDataOnGrid()
+        messagebox.showinfo("Success", "Department added successfully!")
 
-        except Exception as e:
-            # Handle any exceptions (e.g., connection issues, query errors)
-            messagebox.showerror("Error", f"An error occurred while adding the department: {str(e)}")
-
-    else:
-        # Warn the user if any of the fields are empty
-        messagebox.showwarning("Input Error", "Please fill in all fields: Department Code, Name, and Description.")
+    except Exception as e:
+        messagebox.showerror("Error", f"Error adding department: {str(e)}")
 
 
-# Hàm xử lý thao tác xóa phòng ban
 def delete_department():
-    messagebox.showinfo("Info", "Delete functionality not implemented in this version")
+    global selected_item
+    if not selected_item:
+        messagebox.showwarning("Selection Error", "Please select a department to delete.")
+        return
 
-# Hàm xử lý thao tác chỉnh sửa phòng ban
+    try:
+        department_id = uuid.UUID(tree.item(selected_item, "values")[0])  # Convert to UUID
+
+        session = get_cassandra_session()
+        query = "DELETE FROM department WHERE Id = %s"
+        session.execute(query, (department_id,))
+
+        tree.delete(selected_item)
+        messagebox.showinfo("Success", "Department deleted successfully!")
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Error deleting department: {str(e)}")
+
+
 def edit_department():
     global selected_item
     if not selected_item:
         messagebox.showwarning("Selection Error", "Please select a record to edit.")
         return
 
-    # Retrieve the entered data from the input fields
-    department_code = entry_department_code.get()
-    department_name = entry_department_name.get()
-    description = entry_description.get()
+    department_code = entry_department_code.get().strip()
+    department_name = entry_department_name.get().strip()
+    description = entry_description.get().strip()
 
-    if not department_code or not department_name or not description:
+    if not department_code or not department_name:
         messagebox.showwarning("Input Error", "Please fill in all fields.")
         return
 
     try:
-        # Get the department Id (UUID) for the selected record from the Treeview tag
-        department_id = uuid.UUID(tree.item(selected_item, "tags")[0])  # Convert string to UUID
+        department_id = uuid.UUID(tree.item(selected_item, "values")[0])  # Convert to UUID
 
-        if not department_id:
-            messagebox.showwarning("Selection Error", "Invalid department selected.")
-            return
-
-        # Connect to Cassandra
-        cluster = Cluster(['127.0.0.1'])  # Replace with your Cassandra host/IP
-        session = cluster.connect('cassandrakeyspace')  # Replace with your keyspace name
-
-        # Prepare the UPDATE query
-        query = """
-        UPDATE department
-        SET DepartmentCode = %s, DepartmentName = %s, Descriptions = %s
-        WHERE Id = %s
-        """
-
-        # Execute the query to update the record in Cassandra
+        session = get_cassandra_session()
+        query = "UPDATE department SET DepartmentCode = %s, DepartmentName = %s, Descriptions = %s WHERE Id = %s"
         session.execute(query, (department_code, department_name, description, department_id))
 
-        # Clear the input fields
-        entry_department_code.delete(0, tk.END)
-        entry_department_name.delete(0, tk.END)
-        entry_description.delete(0, tk.END)
-
-        # Refresh the Treeview with the updated data
         showDataOnGrid()
-
-        # Show success message
         messagebox.showinfo("Success", "Department updated successfully!")
 
     except Exception as e:
-        # If an error occurs, show an error message
-        messagebox.showerror("Error", f"An error occurred while updating the department: {str(e)}")
+        messagebox.showerror("Error", f"Error updating department: {str(e)}")
 
 
-# Function to connect to Cassandra and Fetch Data
 def fetch_data_from_cassandra():
-    # Connect to the Cassandra cluster and keyspace
-    cluster = Cluster(['127.0.0.1'])  # Replace with your Cassandra host/IP
-    session = cluster.connect('cassandrakeyspace')  # Replace with your keyspace name
+    session = get_cassandra_session()
+    query = "SELECT * FROM department"
+    return sorted(session.execute(query), key=lambda row: row.departmentcode)
 
-    # Fetch data from your table
-    query = "SELECT * FROM department"  # Adjust as necessary
-    rows = session.execute(query)
-
-    # Return rows as a list of tuples
-    return rows
 
 def showDataOnGrid():
-    # Clear the existing data in the Treeview
     for item in tree.get_children():
         tree.delete(item)
 
-    # Fetch data from Cassandra
-    data = fetch_data_from_cassandra()
+    for row in fetch_data_from_cassandra():
+        tree.insert('', 'end', values=(str(row.id), row.departmentcode, row.departmentname, row.descriptions))
 
-    # Insert data into the Treeview (grid)
-    for row in data:
-        # Insert each row with department Id as a tag
-        department_id = row[0]  # Assuming the department Id (UUID) is in the first column
-        # tree.insert('', 'end', values=row, tags=(department_id,))
-        tree.insert('', 'end', values=(row[1], row[2], row[3]), tags=(department_id,))
+
+def get_cassandra_session():
+    return CassandraDB().get_session()

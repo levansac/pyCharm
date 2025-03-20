@@ -1,10 +1,15 @@
 --This is creating key space
-CREATE TABLE DEPARTMENT (
-    Id UUID PRIMARY KEY,                -- Unique identifier for the department
-    DepartmentCode TEXT,    -- DepartmentCode will also be part of the partition key
-    DepartmentName TEXT,    -- Name of the department
-    Descriptions TEXT,      -- Descriptions of the department
+CREATE TABLE department (
+    Id UUID PRIMARY KEY,
+    DepartmentCode TEXT,
+    DepartmentName TEXT,
+    Descriptions TEXT
 );
+
+
+--This allows you to query DepartmentCode without requiring ALLOW FILTERING
+CREATE INDEX department_code_idx ON department (DepartmentCode);
+
 --This is script to insert data into DEPARTMENT table:
 INSERT INTO DEPARTMENT (Id, DepartmentCode, DepartmentName, Descriptions)
 VALUES (uuid(), 'D001', 'Engineering', 'Responsible for developing and maintaining software.');
