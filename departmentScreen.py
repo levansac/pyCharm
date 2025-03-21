@@ -19,33 +19,33 @@ def open_department_screen(root):
 
     label_department_code = tk.Label(frame_department, text="Code:", font=("Arial", 12), bg="#ecf0f1")
     label_department_code.grid(row=1, column=0, sticky="w")
-    entry_department_code = tk.Entry(frame_department, font=("Arial", 12), width=15, relief="groove")
-    entry_department_code.grid(row=1,column=1,padx=5, sticky="w")
+    entry_department_code = tk.Entry(frame_department, font=("Arial", 12), relief="groove")
+    entry_department_code.grid(row=1,column=1, columnspan=2, sticky="w")
     label_department_name = tk.Label(frame_department, text="Name:", font=("Arial", 12), bg="#ecf0f1")
-    label_department_name.grid(row=1, column=2,padx=5)
-    entry_department_name = tk.Entry(frame_department, font=("Arial", 12), width=40, relief="groove")
-    entry_department_name.grid(row=1, column=3,padx=5)
+    label_department_name.grid(row=1, column=3,sticky="e")
+    entry_department_name = tk.Entry(frame_department, font=("Arial", 12), relief="groove")
+    entry_department_name.grid(row=1, column=4,columnspan=3, sticky="ew")
     button_search = tk.Button(frame_department, text="Search", font=("Arial", 12), bg="#27ae60", fg="white", bd=2, activebackground="blue",
-                   activeforeground="white", highlightthickness=7, relief="raised", command=search_department, cursor="hand2", justify="right")
-    button_search.grid(row=1,column=7,padx=5)
+                   activeforeground="white", highlightthickness=7, relief="raised", command=search_department, cursor="hand2", justify="right",height=1,  width=6)
+    button_search.grid(row=1,column=7,sticky="e")
     button_reset = tk.Button(frame_department, text="Clear", font=("Arial", 12), bg="#27ae60", fg="white", bd=2, activebackground="blue",
-                   activeforeground="white", highlightthickness=7, relief="raised", command=showDataOnGrid, cursor="hand2", justify="right")
-    button_reset.grid(row=1, column=8, padx=5,sticky="e")
+                   activeforeground="white", highlightthickness=7, relief="raised", command=reset_fields, cursor="hand2", justify="right", height=1, width=6)
+    button_reset.grid(row=1, column=8,sticky="e")
 
     label_description = tk.Label(frame_department, text="Descriptions:", font=("Arial", 12), bg="#ecf0f1")
     label_description.grid(row=2, column=0, sticky="w")
-    entry_description = tk.Entry(frame_department, font=("Arial", 12), width=70, relief="groove")
-    entry_description.grid(row=2, column=1, columnspan=4)
+    entry_description = tk.Entry(frame_department, font=("Arial", 12), relief="groove")
+    entry_description.grid(row=2, column=1, columnspan=6, sticky="ew")
     button_add = tk.Button(frame_department, text="Add", font=("Arial", 12), bg="#27ae60", fg="white", bd=2, activebackground="blue",
-                   activeforeground="white", highlightthickness=7, relief="raised", command=add_department, cursor="hand2", justify="right")
+                   activeforeground="white", highlightthickness=7, relief="raised", command=add_department, cursor="hand2", justify="right",height=1,  width=6)
     button_add.grid(row=2, column=8, sticky="e")
 
     # Button Edit
     button_edit = tk.Button(frame_department, text="Edit", font=("Arial", 12), bg="#efc497", fg="white", bd=2, activebackground="blue",
-                   activeforeground="white", highlightthickness=7, relief="raised", cursor="hand2", justify="right", command=edit_department)
-    button_edit.grid(row=4, column=5, padx=10, sticky="e")
+                   activeforeground="white", highlightthickness=7, relief="raised", cursor="hand2", justify="right", command=edit_department, height=1,  width=6)
+    button_edit.grid(row=4, column=7, sticky="e")
     button_delete = tk.Button(frame_department, text="Delete", font=("Arial", 12), bg="#f3a0a0", fg="white", bd=2, activebackground="blue",
-                   activeforeground="white", highlightthickness=7, relief="raised", cursor="hand2", justify="right", command=delete_department)
+                   activeforeground="white", highlightthickness=7, relief="raised", cursor="hand2", justify="right", command=delete_department, height=1,  width=6)
     button_delete.grid(row=4, column=8, sticky="e")
 
     # Function creating treeview
@@ -76,7 +76,7 @@ def creatingTreeView():
     style.configure("Treeview",
                     background="#f9f9f9",
                     foreground="black",
-                    rowheight=25,
+                    rowheight=40,
                     fieldbackground="#f9f9f9")
 
     # Define the style for the Treeview heading
@@ -102,16 +102,17 @@ def creatingTreeView():
     tree.grid(row=3, column=0, columnspan=9, sticky="nsew", pady=5)
 
     # Configure row and column weights to make the Treeview expandable
-    frame_department.grid_rowconfigure(2, weight=1)
-    frame_department.grid_columnconfigure(0, weight=1)
+    frame_department.grid_rowconfigure(1, weight=0)
+    frame_department.grid_rowconfigure(2, weight=0)
+    frame_department.grid_columnconfigure(0, weight=0)
     frame_department.grid_columnconfigure(1, weight=1)
-    frame_department.grid_columnconfigure(2, weight=1)
-    frame_department.grid_columnconfigure(3, weight=1)
-    frame_department.grid_columnconfigure(4, weight=1)
+    frame_department.grid_columnconfigure(2, weight=0)
+    frame_department.grid_columnconfigure(3, weight=0)
+    frame_department.grid_columnconfigure(4, weight=0)
     frame_department.grid_columnconfigure(5, weight=1)
-    frame_department.grid_columnconfigure(6, weight=1)
+    frame_department.grid_columnconfigure(6, weight=0)
     frame_department.grid_columnconfigure(7, weight=1)
-    frame_department.grid_columnconfigure(8, weight=1)
+    frame_department.grid_columnconfigure(8, weight=0)
 
     # Bind row selection event
     tree.bind("<<TreeviewSelect>>", on_item_select)
@@ -202,6 +203,7 @@ def delete_department():
 
         tree.delete(selected_item)
         messagebox.showinfo("Success", "Department deleted successfully!")
+        reset_fields()
 
     except Exception as e:
         messagebox.showerror("Error", f"Error deleting department: {str(e)}")
@@ -251,3 +253,9 @@ def showDataOnGrid():
 
 def get_cassandra_session():
     return CassandraDB().get_session()
+
+def reset_fields():
+    entry_department_code.delete(0, tk.END)
+    entry_department_name.delete(0, tk.END)
+    entry_description.delete(0, tk.END)
+    showDataOnGrid()  # Refresh the grid
