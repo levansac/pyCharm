@@ -71,7 +71,7 @@ def open_department_screen(root):
 def creatingTreeView():
     global tree, frame_department, selected_item
     # Create Treeview widget (Grid/Table)
-    tree = ttk.Treeview(frame_department, show="headings", height=12)
+    tree = ttk.Treeview(frame_department, show="headings", height=17)
 
     tree['columns'] = ('Id', 'DepartmentCode', 'DepartmentName', 'Descriptions', 'CreatedDate', 'ModifiedDate')
 
@@ -96,7 +96,7 @@ def creatingTreeView():
     style.configure("Treeview",
                     background="#f9f9f9",
                     foreground="black",
-                    rowheight=39,
+                    rowheight=32,
                     fieldbackground="#f9f9f9")
 
     # Define the style for the Treeview heading

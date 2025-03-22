@@ -5,28 +5,11 @@ from UI.departmentScreen import open_department_screen
 from tkinter import Label  # Explicitly import Label
 from tkinter import PhotoImage  # Import PhotoImage if using PNG
 
-# Function to center the window on the screen
-def center_window(window, width, height):
-    # Get the screen width and height
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
-
-    # Calculate the position to center the window
-    position_top = int(screen_height / 2 - height / 2)
-    position_right = int(screen_width / 2 - width / 2)
-
-    # Set the window geometry (position + width x height)
-    window.geometry(f'{width}x{height}+{position_right}+{position_top}')
-
 # Tạo cửa sổ chính
 root = tk.Tk()
+root.state('zoomed')
 root.title("HR Application")
 root.configure(bg="#f0f0f0")  # Màu nền cửa sổ chính
-# Set the desired width and height for the window
-window_width = 1300
-window_height = 700
-# Center the window
-center_window(root, window_width, window_height)
 
 #Khai báo biến ở đây
 txtEmpScreen ="Employee Management"

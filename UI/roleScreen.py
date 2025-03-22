@@ -64,7 +64,7 @@ def open_role_screen(root):
 def creatingTreeView():
     global tree, frame_role, selected_item
     # Create Treeview widget (Grid/Table)
-    tree = ttk.Treeview(frame_role, show="headings", height=12)
+    tree = ttk.Treeview(frame_role, show="headings", height=17)
     tree['columns'] = ('Id', 'RoleCode', 'RoleName', 'Descriptions', 'CreatedDate', 'ModifiedDate')
 
     tree.heading('Id', text='Id')  # Hidden column
@@ -89,7 +89,7 @@ def creatingTreeView():
     style.configure("Treeview",
                     background="#f9f9f9",
                     foreground="black",
-                    rowheight=39,
+                    rowheight=32,
                     fieldbackground="#f9f9f9")
 
     # Define the style for the Treeview heading
