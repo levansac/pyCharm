@@ -1,0 +1,5 @@
+nodetool status
+nodetool info
+nodetool describecluster
+DESCRIBE KEYSPACES;
+DESCRIBE TABLES;

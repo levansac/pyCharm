@@ -1,0 +1,17 @@
+0, Install python, pycharm
+
+I, Setup environment
+    1, Install docker
+        https://docs.docker.com/desktop/setup/install/windows-install/
+    2, Pull Cassandra Docker Image
+        open cmd run: docker pull cassandra:latest
+    3, Run a cassandra container
+        open cmd run: docker run --name cassandra -d -p 9042:9042 cassandra:latest
+    4, Connect to cassandra
+        open cmd run: docker exec -it cassandra cqlsh
+
+II, Install libraries on python
+    1, cassandra-driver for using cassandra on python
+        open terminal on pycharm (Alt F12): pip install cassandra-driver
+    2, install XlsxWriter for exporting data to excel
+        open terminal on pycharm (Alt F12): pip install XlsxWriter
