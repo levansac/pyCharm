@@ -1,5 +1,8 @@
+docker exec -it cassandra /bin/bash
 nodetool status
 nodetool info
 nodetool describecluster
 DESCRIBE KEYSPACES;
 DESCRIBE TABLES;
+
+docker exec -it cassandra cqlsh

@@ -5,6 +5,7 @@ import uuid
 from cassandra.cluster import Cluster
 from connector.cassandra_connection import CassandraDB
 import datetime
+from common.utilities import export_to_excel
 
 
 def open_role_screen(root):
@@ -40,6 +41,12 @@ def open_role_screen(root):
     button_add = tk.Button(frame_role, text="Add", font=("Arial", 12), bg="#27ae60", fg="white", bd=2, activebackground="blue",
                    activeforeground="white", highlightthickness=7, relief="raised", command=add_role, cursor="hand2", justify="right",height=1,  width=6)
     button_add.grid(row=2, column=8, sticky="e", pady=(5,0))
+
+    button_export = tk.Button(frame_role, text="Export", font=("Arial", 12), bg="#f3a0a0", fg="white", bd=2,
+                              activebackground="blue",
+                              activeforeground="white", highlightthickness=7, relief="raised", cursor="hand2",
+                              justify="right", command=lambda: export_to_excel(tree), height=1, width=6)
+    button_export.grid(row=4, column=6, sticky="e", padx=(0, 5))
 
     # Button Edit
     button_edit = tk.Button(frame_role, text="Edit", font=("Arial", 12), bg="#efc497", fg="white", bd=2, activebackground="blue",

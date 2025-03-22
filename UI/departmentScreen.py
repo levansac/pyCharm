@@ -4,8 +4,6 @@ from tkinter import ttk
 import uuid
 from connector.cassandra_connection import CassandraDB
 import datetime
-import pandas as pd
-from tkinter import filedialog
 from common.utilities import export_to_excel
 
 
