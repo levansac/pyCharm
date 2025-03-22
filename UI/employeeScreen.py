@@ -4,9 +4,10 @@ from tkinter import ttk
 import uuid
 from cassandra.cluster import Cluster
 from connector.cassandra_connection import CassandraDB
+import datetime
 
 
-def open_department_screen(root):
+def open_employee_screen(root):
     global frame_department, entry_department_code, entry_department_name, entry_description, tree, selected_item
 
     selected_item = None
@@ -56,18 +57,24 @@ def open_department_screen(root):
 def creatingTreeView():
     global tree, frame_department, selected_item
     # Create Treeview widget (Grid/Table)
-    tree = ttk.Treeview(frame_department, show="headings")
-    tree['columns'] = ('Id', 'DepartmentCode', 'DepartmentName', 'Descriptions')
+    tree = ttk.Treeview(frame_department, show="headings", height=12)
+
+    tree['columns'] = ('Id', 'DepartmentCode', 'DepartmentName', 'Descriptions', 'CreatedDate', 'ModifiedDate')
 
     tree.heading('Id', text='Id')  # Hidden column
     tree.heading('DepartmentCode', text='Code')
     tree.heading('DepartmentName', text='Name')
     tree.heading('Descriptions', text='Descriptions')
+    tree.heading('CreatedDate', text='Created Date')
+    tree.heading('ModifiedDate', text='Modified Date')
 
     tree.column('Id', width=0, stretch=False)  # Hide the ID column
     tree.column('DepartmentCode', width=100, anchor='center')
     tree.column('DepartmentName', width=200, anchor='center')
     tree.column('Descriptions', width=300, anchor='center')
+    tree.column('CreatedDate', width=100, anchor='center')
+    tree.column('ModifiedDate', width=100, anchor='center')
+
 
     # Add Style for borders
     style = ttk.Style()
@@ -76,7 +83,7 @@ def creatingTreeView():
     style.configure("Treeview",
                     background="#f9f9f9",
                     foreground="black",
-                    rowheight=40,
+                    rowheight=39,
                     fieldbackground="#f9f9f9")
 
     # Define the style for the Treeview heading
@@ -116,6 +123,18 @@ def creatingTreeView():
 
     # Bind row selection event
     tree.bind("<<TreeviewSelect>>", on_item_select)
+    tree.bind("<Double-1>", on_double_click)  # Bind double-click to show full value
+
+def on_double_click(event):
+    global selected_item
+    selected_item = tree.selection()  # Get selected row
+    if selected_item:
+        values = tree.item(selected_item, "values")  # Get all column values
+        column = tree.identify_column(event.x)  # Identify which column was clicked
+        col_index = int(column[1:]) - 1  # Convert column format (‘#1’, ‘#2’) to an index
+
+        if 0 <= col_index < len(values):  # Ensure valid index
+            messagebox.showinfo("Full Value", values[col_index])  # Show full value
 
 
 def on_item_select(event):
@@ -141,22 +160,29 @@ def search_department():
     search_code = entry_department_code.get().strip().lower()
     search_name = entry_department_name.get().strip().lower()
 
-    if not search_code or not search_name:
-        messagebox.showwarning("Search Error", "Please enter a search information.")
+    if not search_code and not search_name:
+        reset_fields()
         return
 
+    # Clear previous search results
     for item in tree.get_children():
         tree.delete(item)
 
-    for row in fetch_data_from_cassandra():
-        if search_code in row.departmentcode.lower() or search_name in row.departmentname.lower():
-            tree.insert('', 'end', values=(str(row.id), row.departmentcode, row.departmentname, row.descriptions))
+    try:
+        for row in fetch_data_from_cassandra():
+            if (search_code and search_code in row.departmentcode.lower()) or \
+               (search_name and search_name in row.departmentname.lower()):
+                tree.insert('', 'end', values=(str(row.id), row.departmentcode, row.departmentname, row.descriptions, row.createddate, row.modifieddate))
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {str(e)}")
+
 
 def add_department():
     department_id = uuid.uuid4()
     department_code = entry_department_code.get().strip()
     department_name = entry_department_name.get().strip()
     description = entry_description.get().strip()
+    created_date = datetime.datetime.now()
 
     if not department_code or not department_name:
         messagebox.showwarning("Input Error", "Please fill in all fields.")
@@ -174,8 +200,8 @@ def add_department():
             messagebox.showwarning("Duplicate Entry", "A department with this code already exists!")
             return
 
-        insert_query = "INSERT INTO department (Id, DepartmentCode, DepartmentName, Descriptions) VALUES (%s, %s, %s, %s)"
-        session.execute(insert_query, (department_id, department_code, department_name, description))
+        insert_query = "INSERT INTO department (Id, DepartmentCode, DepartmentName, Descriptions) VALUES (%s, %s, %s, %s, %s)"
+        session.execute(insert_query, (department_id, department_code, department_name, description,created_date))
 
         entry_department_code.delete(0, tk.END)
         entry_department_name.delete(0, tk.END)
@@ -218,6 +244,7 @@ def edit_department():
     department_code = entry_department_code.get().strip()
     department_name = entry_department_name.get().strip()
     description = entry_description.get().strip()
+    modified_date = datetime.datetime.now()
 
     if not department_code or not department_name:
         messagebox.showwarning("Input Error", "Please fill in all fields.")
@@ -227,8 +254,8 @@ def edit_department():
         department_id = uuid.UUID(tree.item(selected_item, "values")[0])  # Convert to UUID
 
         session = get_cassandra_session()
-        query = "UPDATE department SET DepartmentCode = %s, DepartmentName = %s, Descriptions = %s WHERE Id = %s"
-        session.execute(query, (department_code, department_name, description, department_id))
+        query = "UPDATE department SET DepartmentCode = %s, DepartmentName = %s, Descriptions = %s, ModifiedDate = %s WHERE Id = %s"
+        session.execute(query, (department_code, department_name, description, modified_date, department_id))
 
         showDataOnGrid()
         messagebox.showinfo("Success", "Department updated successfully!")
@@ -248,7 +275,7 @@ def showDataOnGrid():
         tree.delete(item)
 
     for row in fetch_data_from_cassandra():
-        tree.insert('', 'end', values=(str(row.id), row.departmentcode, row.departmentname, row.descriptions))
+        tree.insert('', 'end', values=(str(row.id), row.departmentcode, row.departmentname, row.descriptions, row.createddate, row.modifieddate))
 
 
 def get_cassandra_session():
