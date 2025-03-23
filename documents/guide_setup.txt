@@ -13,5 +13,7 @@ I, Setup environment
 II, Install libraries on python
     1, cassandra-driver for using cassandra on python
         open terminal on pycharm (Alt F12): pip install cassandra-driver
-    2, install XlsxWriter for exporting data to excel
+    2, pandas for export data
+        open terminal on pycharm (Alt F12): pip install pandas
+    3, install XlsxWriter for exporting data to excel
         open terminal on pycharm (Alt F12): pip install XlsxWriter

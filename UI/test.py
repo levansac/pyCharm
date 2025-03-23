@@ -1,53 +1,84 @@
-import uuid
-import datetime
 import tkinter as tk
-from tkinter import messagebox
-from cassandra.cluster import Cluster
+from tkinter import ttk
+
+# Sample Data (Replace with real Cassandra query results)
+data = [
+    ("EMP001", "John", "Doe", "john.doe@example.com", "+1234567890", 0),  # Active
+    ("EMP002", "Alice", "Smith", "alice.smith@example.com", "+1987654321", 1),  # Inactive
+    ("EMP003", "Michael", "Brown", "michael.brown@example.com", "+1122334455", 0),  # Active
+]
 
 
-def get_cassandra_session():
-    """Function to return a Cassandra session."""
-    cluster = Cluster(['127.0.0.1'])  # Update with your Cassandra host
-    session = cluster.connect('your_keyspace')  # Replace 'your_keyspace' with your actual keyspace
-    return session
+# Function to Convert Status (0 → "Active", 1 → "Inactive")
+def get_status_text(status):
+    return "Active" if status == 0 else "Inactive"
 
 
-def add_department():
-    department_id = uuid.uuid4()
-    department_code = entry_department_code.get().strip()
-    department_name = entry_department_name.get().strip()
-    description = entry_description.get().strip()
+# Create Main Window
+root = tk.Tk()
+root.title("Employee Management")
+root.geometry("600x400")
 
-    if not department_code or not department_name:
-        messagebox.showwarning("Input Error", "Please fill in all fields.")
-        return
+# Treeview Frame
+frame = tk.Frame(root)
+frame.pack(pady=20)
 
-    try:
-        session = get_cassandra_session()
+# Define Columns
+columns = ("EmployeeCode", "FirstName", "LastName", "Email", "Phone", "Status")
+tree = ttk.Treeview(frame, columns=columns, show="headings")
 
-        # Check if department with the same code exists (optimized)
-        check_query = "SELECT DepartmentCode FROM department WHERE DepartmentCode = %s LIMIT 1"
-        result = session.execute(check_query, (department_code,))
+# Define Headings
+for col in columns:
+    tree.heading(col, text=col)
+    tree.column(col, width=100)
 
-        if result.one():  # If any row is returned, department already exists
-            messagebox.showwarning("Duplicate Entry", "A department with this code already exists!")
-            return
+# Insert Sample Data with Converted Status
+for emp in data:
+    tree.insert("", "end", values=(emp[0], emp[1], emp[2], emp[3], emp[4], get_status_text(emp[5])))
 
-        # Get the current date
-        created_date = datetime.datetime.now()
+tree.pack()
 
-        # Insert new department including CreatedDate
-        insert_query = """INSERT INTO department (Id, DepartmentCode, DepartmentName, Descriptions, CreatedDate)
-                          VALUES (%s, %s, %s, %s, %s)"""
-        session.execute(insert_query, (department_id, department_code, department_name, description, created_date))
+# Labels & Entry Fields
+labels = ["Employee Code:", "First Name:", "Last Name:", "Email:", "Phone:"]
+entries = {}
 
-        # Clear input fields
-        entry_department_code.delete(0, tk.END)
-        entry_department_name.delete(0, tk.END)
-        entry_description.delete(0, tk.END)
+for i, label in enumerate(labels):
+    tk.Label(root, text=label).place(x=50, y=250 + (i * 30))
+    entry = tk.Entry(root)
+    entry.place(x=200, y=250 + (i * 30))
+    entries[label] = entry  # Store Entry widgets in dictionary
 
-        showDataOnGrid()  # Refresh the grid
-        messagebox.showinfo("Success", "Department added successfully!")
+# Status Label & Listbox
+tk.Label(root, text="Status:").place(x=50, y=400)
+status_listbox = tk.Listbox(root, height=2)
+status_listbox.place(x=200, y=400)
 
-    except Exception as e:
-        messagebox.showerror("Error", f"Error adding department: {str(e)}")
+# Populate Listbox with Status Options
+status_options = ["Active", "Inactive"]
+for status in status_options:
+    status_listbox.insert(tk.END, status)
+
+
+# Function to Display Selected Row in Entry Fields & Listbox
+def on_tree_select(event):
+    selected_item = tree.selection()
+    if selected_item:
+        values = tree.item(selected_item, "values")
+
+        # Update Entry Fields
+        for i, key in enumerate(labels):
+            entries[key].delete(0, tk.END)
+            entries[key].insert(0, values[i])
+
+        # Update Status Listbox Selection
+        status_listbox.selection_clear(0, tk.END)  # Clear previous selection
+        for i, status in enumerate(status_options):
+            if values[-1] == status:  # Compare with status text
+                status_listbox.selection_set(i)
+
+
+# Bind Selection Event
+tree.bind("<<TreeviewSelect>>", on_tree_select)
+
+# Run Application
+root.mainloop()

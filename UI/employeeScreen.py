@@ -64,8 +64,9 @@ def open_employee_screen(root):
 
     label_employee_status = tk.Label(frame_employee, text="Status:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_status.grid(row=2, column=6)
-    entry_employee_status = tk.Entry(frame_employee, font=("Arial", 12), relief="groove")
+    entry_employee_status = tk.Entry(frame_employee, font=("Arial", 12), relief="groove", state="readonly")
     entry_employee_status.grid(row=2, column=7)
+    # Disable user selection change
 
     button_add = tk.Button(frame_employee, text="Add", font=("Arial", 12), bg="#27ae60", fg="white", bd=2,
                            activebackground="blue",
@@ -100,7 +101,7 @@ def creatingTreeView():
     tree = ttk.Treeview(frame_employee, show="headings", height=17)
 
     tree['columns'] = ('Id', 'EmployeeCode', 'FirstName', 'LastName', 'Email', 'Phone','DepartmentId',
-                        'RoleId', 'StartDate', 'EndDate','CreatedDate', 'ModifiedDate')
+                        'RoleId', 'Status','StartDate', 'EndDate','CreatedDate', 'ModifiedDate')
 
     tree.heading('Id', text='Id')  # Hidden column
     tree.heading('EmployeeCode', text='Code')
@@ -110,6 +111,7 @@ def creatingTreeView():
     tree.heading('Phone', text='Phone')
     tree.heading('DepartmentId', text='DepartmentId')
     tree.heading('RoleId', text='RoleId')
+    tree.heading('Status', text='Status')
     tree.heading('StartDate', text='StartDate')
     tree.heading('EndDate', text='EndDate')
 
@@ -117,13 +119,14 @@ def creatingTreeView():
     tree.heading('ModifiedDate', text='Modified Date')
 
     tree.column('Id', width=0, stretch=False)  # Hide the ID column
-    tree.column('EmployeeCode', width=100, anchor='center')
+    tree.column('EmployeeCode', width=150, anchor='center')
     tree.column('FirstName', width=200, anchor='center')
     tree.column('LastName', width=200, anchor='center')
     tree.column('Email', width=250, anchor='center')
     tree.column('Phone', width=100, anchor='center')
     tree.column('DepartmentId', width=100, anchor='center')
     tree.column('RoleId', width=100, anchor='center')
+    tree.column('Status', width=100, anchor='center')
     tree.column('StartDate', width=100, anchor='center')
     tree.column('EndDate', width=100, anchor='center')
     tree.column('CreatedDate', width=100, anchor='center')
@@ -228,6 +231,10 @@ def on_item_select(event):
     entry_employee_department.insert(0, values[6])
     entry_employee_role.delete(0, tk.END)
     entry_employee_role.insert(0, values[7])
+    entry_employee_status.config(state="normal")
+    entry_employee_status.delete(0, tk.END)
+    entry_employee_status.insert(0, values[8])
+    entry_employee_status.config(state="readonly")
 
 
 def search_employee():
@@ -258,6 +265,7 @@ def add_employee():
     employee_code = entry_employee_code.get().strip()
     employee_firstname = entry_employee_firstname.get().strip()
     employee_lastname = entry_employee_lastname.get().strip()
+    employee_email = entry_employee_email.get().strip()
     created_date = datetime.datetime.now()
 
     if not employee_code or not employee_firstname:
@@ -276,8 +284,8 @@ def add_employee():
             messagebox.showwarning("Duplicate Entry", "A employee with this code already exists!")
             return
 
-        insert_query = "INSERT INTO employee (Id, EmployeeCode, FirstName, LastName, CreatedDate) VALUES (%s, %s, %s, %s, %s)"
-        session.execute(insert_query, (employee_id, employee_code, employee_firstname, employee_lastname, created_date))
+        insert_query = "INSERT INTO employee (Id, EmployeeCode, FirstName,Email LastName, CreatedDate) VALUES (%s, %s, %s, %s, %s, %s)"
+        session.execute(insert_query, (employee_id, employee_code, employee_firstname, employee_lastname,employee_email, created_date))
 
         messagebox.showinfo("Success", "Employee added successfully!")
         reset_fields()
@@ -348,7 +356,7 @@ def show_data_on_grid():
 
     for row in fetch_data_from_cassandra():
         tree.insert('', 'end', values=(
-            str(row.id), row.employeecode, row.firstname, row.lastname,  row.email,row.phone,row.departmentid, row.roleid, row.startdate,row.enddate,row.createddate, row.modifieddate))
+            str(row.id), row.employeecode, row.firstname, row.lastname,  row.email,row.phone,row.departmentid, row.roleid, get_status_text(row.status), row.startdate,row.enddate,row.createddate, row.modifieddate))
 
 def get_cassandra_session():
     return CassandraDB().get_session()
@@ -365,3 +373,7 @@ def reset_fields():
     entry_employee_status.delete(0, tk.END)
 
     show_data_on_grid()  # Refresh the grid
+
+# Function to Convert Status (0 → "Active", 1 → "Inactive")
+def get_status_text(status):
+    return "Active" if status == 0 else "Inactive"
