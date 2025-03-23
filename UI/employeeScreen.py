@@ -266,6 +266,8 @@ def add_employee():
     employee_firstname = entry_employee_firstname.get().strip()
     employee_lastname = entry_employee_lastname.get().strip()
     employee_email = entry_employee_email.get().strip()
+    employee_phone = entry_employee_phone.get().strip()
+    employee_status = 0
     created_date = datetime.datetime.now()
 
     if not employee_code or not employee_firstname:
@@ -284,8 +286,8 @@ def add_employee():
             messagebox.showwarning("Duplicate Entry", "A employee with this code already exists!")
             return
 
-        insert_query = "INSERT INTO employee (Id, EmployeeCode, FirstName,Email LastName, CreatedDate) VALUES (%s, %s, %s, %s, %s, %s)"
-        session.execute(insert_query, (employee_id, employee_code, employee_firstname, employee_lastname,employee_email, created_date))
+        insert_query = "INSERT INTO employee (Id, EmployeeCode, FirstName, LastName, Email, Phone,Status, CreatedDate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        session.execute(insert_query, (employee_id, employee_code, employee_firstname, employee_lastname,employee_email, employee_phone,employee_status, created_date))
 
         messagebox.showinfo("Success", "Employee added successfully!")
         reset_fields()
@@ -370,7 +372,9 @@ def reset_fields():
     entry_employee_email.delete(0, tk.END)
     entry_employee_department.delete(0, tk.END)
     entry_employee_role.delete(0, tk.END)
+    entry_employee_status.config(state="normal")
     entry_employee_status.delete(0, tk.END)
+    entry_employee_status.config(state="readonly")
 
     show_data_on_grid()  # Refresh the grid
 

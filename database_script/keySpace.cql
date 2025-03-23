@@ -1,4 +1,4 @@
-CREATE KEYSPACE cassandra_keyspace
+CREATE KEYSPACE cassandrakeyspace
 WITH replication = {'class' : 'SimpleStrategy', 'replication_factor' : 3
 
 };
