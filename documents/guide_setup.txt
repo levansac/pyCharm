@@ -17,3 +17,5 @@ II, Install libraries on python
         open terminal on pycharm (Alt F12): pip install pandas
     3, install XlsxWriter for exporting data to excel
         open terminal on pycharm (Alt F12): pip install XlsxWriter
+    4, install datetimePicker
+        open terminal on pycharm (Alt F12): pip install tkcalendar

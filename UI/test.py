@@ -1,85 +1,56 @@
 import tkinter as tk
 from tkinter import ttk
+from tkcalendar import DateEntry, Calendar
+from datetime import datetime
 
-# Sample Data (Replace with real Cassandra query results)
-data = [
-    ("EMP001", "John", "Doe", "john.doe@example.com", "+1234567890", 0),  # Active
-    ("EMP002", "Alice", "Smith", "alice.smith@example.com", "+1987654321", 1),  # Inactive
-    ("EMP003", "Michael", "Brown", "michael.brown@example.com", "+1122334455", 0),  # Active
-]
+def open_datetime_picker():
+    """ Opens a popup with a Date Picker and Time selection. """
+    def select_date_time():
+        """ Set selected date & time to DateEntry. """
+        selected_date = cal.selection_get()
+        selected_time = f"{hour_var.get()}:{minute_var.get()}"
+        formatted_datetime = f"{selected_date.strftime('%Y-%m-%d')} {selected_time}"
+        entry_employee_startdate.delete(0, tk.END)
+        entry_employee_startdate.insert(0, formatted_datetime)
+        popup.destroy()  # Close popup
 
+    # Create popup window
+    popup = tk.Toplevel(root)
+    popup.title("Select Date & Time")
+    popup.geometry("250x300")
+    popup.transient(root)  # Make it modal
+    popup.grab_set()  # Focus on popup
 
-# Function to Convert Status (0 → "Active", 1 → "Inactive")
-def get_status_text(status):
-    return "Active" if status == 0 else "Inactive"
+    # Add Calendar widget
+    cal = Calendar(popup, selectmode="day", date_pattern="yyyy-MM-dd")
+    cal.pack(pady=10)
 
+    # Add time selection (Hour & Minute)
+    frame_time = ttk.Frame(popup)
+    frame_time.pack(pady=5)
 
-# Create Main Window
+    ttk.Label(frame_time, text="Hour:").pack(side="left")
+    hour_var = ttk.Combobox(frame_time, values=[f"{i:02d}" for i in range(24)], width=3)
+    hour_var.set(datetime.now().strftime("%H"))  # Default to current hour
+    hour_var.pack(side="left")
+
+    ttk.Label(frame_time, text=":").pack(side="left")
+
+    ttk.Label(frame_time, text="Minute:").pack(side="left")
+    minute_var = ttk.Combobox(frame_time, values=[f"{i:02d}" for i in range(60)], width=3)
+    minute_var.set(datetime.now().strftime("%M"))  # Default to current minute
+    minute_var.pack(side="left")
+
+    # Confirm Button
+    ttk.Button(popup, text="Select", command=select_date_time).pack(pady=10)
+
+# Create main window
 root = tk.Tk()
 root.title("Employee Management")
-root.geometry("600x400")
 
-# Treeview Frame
-frame = tk.Frame(root)
-frame.pack(pady=20)
+# Create DateEntry & bind click event
+entry_employee_startdate = DateEntry(root, width=15, background='darkblue', foreground='white', borderwidth=2)
+entry_employee_startdate.grid(row=6, column=1, padx=5, pady=5)
+entry_employee_startdate.bind("<Button-1>", lambda e: open_datetime_picker())  # Open picker on click
 
-# Define Columns
-columns = ("EmployeeCode", "FirstName", "LastName", "Email", "Phone", "Status")
-tree = ttk.Treeview(frame, columns=columns, show="headings")
-
-# Define Headings
-for col in columns:
-    tree.heading(col, text=col)
-    tree.column(col, width=100)
-
-# Insert Sample Data with Converted Status
-for emp in data:
-    tree.insert("", "end", values=(emp[0], emp[1], emp[2], emp[3], emp[4], get_status_text(emp[5])))
-
-tree.pack()
-
-# Labels & Entry Fields
-labels = ["Employee Code:", "First Name:", "Last Name:", "Email:", "Phone:"]
-entries = {}
-
-for i, label in enumerate(labels):
-    tk.Label(root, text=label).place(x=50, y=250 + (i * 30))
-    entry = tk.Entry(root)
-    entry.place(x=200, y=250 + (i * 30))
-    entries[label] = entry  # Store Entry widgets in dictionary
-
-# Status Label & Listbox
-tk.Label(root, text="Status:").place(x=50, y=400)
-status_listbox = tk.Listbox(root, height=2)
-status_listbox.place(x=200, y=400)
-
-# Populate Listbox with Status Options
-status_options = ["Active", "Inactive"]
-for status in status_options:
-    status_listbox.insert(tk.END, status)
-
-
-# Function to Display Selected Row in Entry Fields & Listbox
-def on_tree_select(event):
-    selected_item = tree.selection()
-    if selected_item:
-        values = tree.item(selected_item, "values")
-
-        # Update Entry Fields
-        for i, key in enumerate(labels):
-            entries[key].delete(0, tk.END)
-            entries[key].insert(0, values[i])
-
-        # Update Status Listbox Selection
-        status_listbox.selection_clear(0, tk.END)  # Clear previous selection
-        for i, status in enumerate(status_options):
-            if values[-1] == status:  # Compare with status text
-                status_listbox.selection_set(i)
-
-
-# Bind Selection Event
-tree.bind("<<TreeviewSelect>>", on_tree_select)
-
-# Run Application
-#fd
 root.mainloop()
