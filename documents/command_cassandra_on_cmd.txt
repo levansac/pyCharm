@@ -1,8 +1,13 @@
+DESCRIBE KEYSPACES;
+DESCRIBE TABLES;
+use cassandrakeyspace;
+
+--open nodetool
 docker exec -it cassandra /bin/bash
 nodetool status
 nodetool info
 nodetool describecluster
-DESCRIBE KEYSPACES;
-DESCRIBE TABLES;
 
+
+--open cqlsh
 docker exec -it cassandra cqlsh

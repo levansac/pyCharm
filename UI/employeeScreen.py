@@ -250,14 +250,12 @@ def search_employee():
         tree.delete(item)
 
     try:
-        for row in fetch_data_from_cassandra():
-            if (search_code and search_code in row.employeecode.lower()) or \
-                    (search_name and search_name in row.employeename.lower()):
-                tree.insert('', 'end', values=(
-                    str(row.id), row.employeecode, row.employeename, row.descriptions, row.createddate,
-                    row.modifieddate))
+        fetch_employees_with_details(search_code,search_name)
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {str(e)}")
+
+
+
 
 
 def add_employee():
@@ -269,6 +267,8 @@ def add_employee():
     employee_phone = entry_employee_phone.get().strip()
     employee_status = 0
     created_date = datetime.datetime.now()
+    employee_department = uuid.UUID(entry_employee_department.get().strip())
+    employee_role = uuid.UUID(entry_employee_role.get().strip())
 
     if not employee_code or not employee_firstname:
         messagebox.showwarning("Input Error", "Please fill in all fields.")
@@ -286,8 +286,8 @@ def add_employee():
             messagebox.showwarning("Duplicate Entry", "A employee with this code already exists!")
             return
 
-        insert_query = "INSERT INTO employee (Id, EmployeeCode, FirstName, LastName, Email, Phone,Status, CreatedDate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-        session.execute(insert_query, (employee_id, employee_code, employee_firstname, employee_lastname,employee_email, employee_phone,employee_status, created_date))
+        insert_query = "INSERT INTO employee (Id, EmployeeCode, FirstName, LastName, Email, Phone, DepartmentId, RoleId, Status, CreatedDate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        session.execute(insert_query, (employee_id, employee_code, employee_firstname, employee_lastname,employee_email, employee_phone,employee_department,employee_role, employee_status, created_date))
 
         messagebox.showinfo("Success", "Employee added successfully!")
         reset_fields()
@@ -356,9 +356,49 @@ def show_data_on_grid():
     for item in tree.get_children():
         tree.delete(item)
 
-    for row in fetch_data_from_cassandra():
-        tree.insert('', 'end', values=(
-            str(row.id), row.employeecode, row.firstname, row.lastname,  row.email,row.phone,row.departmentid, row.roleid, get_status_text(row.status), row.startdate,row.enddate,row.createddate, row.modifieddate))
+    for employee in fetch_employees_with_details():
+        tree.insert('', 'end', values=employee)
+
+def get_department_dict():
+    session = get_cassandra_session()
+    query = "SELECT Id, DepartmentName FROM department"
+    rows = session.execute(query)
+
+    # Create a dictionary {department_id: department_name}
+    return {str(row.id): row.departmentname for row in rows}
+
+
+def get_role_dict():
+    session = get_cassandra_session()
+    query = "SELECT Id, RoleName FROM role"
+    rows = session.execute(query)
+
+    # Create a dictionary {role_id: role_name}
+    return {str(row.id): row.rolename for row in rows}
+
+
+def fetch_employees_with_details(search_code=None, search_name=None):
+    session = get_cassandra_session()
+    query = "SELECT Id, EmployeeCode, FirstName, LastName, Email, Phone, DepartmentId, RoleId, Status, StartDate, EndDate, CreatedDate, ModifiedDate FROM employee"
+
+    rows = session.execute(query)
+
+    # Get department and role dictionaries
+    dept_dict = get_department_dict()
+    role_dict = get_role_dict()
+
+    employees = []
+    for row in rows:
+        department_name = dept_dict.get(str(row.departmentid), "Unknown")  # Lookup department name
+        role_name = role_dict.get(str(row.roleid), "Unknown")  # Lookup role name
+        employees.append((
+            str(row.id), row.employeecode, row.firstname, row.lastname, row.email,
+            row.phone, department_name, role_name, get_status_text(row.status),
+            row.startdate, row.enddate, row.createddate, row.modifieddate
+        ))
+
+    return employees
+
 
 def get_cassandra_session():
     return CassandraDB().get_session()
