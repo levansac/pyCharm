@@ -29,14 +29,14 @@ image_label.image = image
 image_label.pack()
 
 # Thêm các nút vào frame bên trái
-button1 = tk.Button(frame_left, text=txtEmpScreen, command=lambda : show_screen(txtEmpScreen), width=20, bg="green", fg="#fff", font=("Arial", 12), anchor='w')
-button1.pack(pady=20)
+button_emp = tk.Button(frame_left, text=txtEmpScreen, command=lambda : show_screen(txtEmpScreen), width=20, bg="green", fg="#fff", font=("Arial", 12), anchor='w')
+button_emp.pack(pady=20)
 
-button2 = tk.Button(frame_left, text=txtDepartmentScreen, command= lambda : show_screen(txtDepartmentScreen), width=20, bg="green", fg="#fff", font=("Arial", 12), anchor='w')
-button2.pack(pady=20)
+button_dept = tk.Button(frame_left, text=txtDepartmentScreen, command= lambda : show_screen(txtDepartmentScreen), width=20, bg="green", fg="#fff", font=("Arial", 12), anchor='w')
+button_dept.pack(pady=20)
 
-button3 = tk.Button(frame_left, text=txtRoleScreen, command=lambda : show_screen(txtRoleScreen), width=20, bg="green", fg="#fff", font=("Arial", 12), anchor='w')
-button3.pack(pady=20)
+button_role = tk.Button(frame_left, text=txtRoleScreen, command=lambda : show_screen(txtRoleScreen), width=20, bg="green", fg="#fff", font=("Arial", 12), anchor='w')
+button_role.pack(pady=20)
 
 # Add bottom label
 bottom_label = Label(frame_left, text="Made by: vietmy, ngockieng, saclv", fg="white", bg="#2c3e50", font=("Arial", 8, "italic"))
@@ -45,15 +45,35 @@ bottom_label.pack(side="bottom", pady=10)  # Place it at the bottom
 def show_screen(menu):
     #close if any exist frame first
     global isFrameOpen
+    enable_buttons()
     if isFrameOpen is not None and isFrameOpen.winfo_ismapped():
         isFrameOpen.pack_forget()
 
-    if menu == txtDepartmentScreen:
-        isFrameOpen = open_department_screen(root)
-    elif menu == txtEmpScreen:
+    if menu == txtEmpScreen:
+        button_emp.config(state=tk.DISABLED)
         isFrameOpen = open_employee_screen(root)
+
+    elif menu == txtDepartmentScreen:
+        button_dept.config(state=tk.DISABLED)
+        isFrameOpen = open_department_screen(root)
+
     elif menu == txtRoleScreen:
+        button_role.config(state=tk.DISABLED)
         isFrameOpen = open_role_screen(root)
+    # Re-enable buttons after 1 seconds
+
+
+def disable_buttons():
+    button_emp.config(state=tk.DISABLED)
+    button_dept.config(state=tk.DISABLED)
+    button_role.config(state=tk.DISABLED)
+
+def enable_buttons():
+    button_emp.config(state=tk.NORMAL)
+    button_dept.config(state=tk.NORMAL)
+    button_role.config(state=tk.NORMAL)
 
 # Hiển thị cửa sổ
 root.mainloop()
+
+
