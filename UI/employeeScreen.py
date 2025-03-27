@@ -3,7 +3,8 @@ from tkinter import messagebox
 from tkinter import ttk
 import uuid
 from connector.cassandra_connection import CassandraDB
-import datetime
+# import datetime
+from datetime import datetime
 from common.utilities import export_to_excel
 from tkcalendar import DateEntry
 
@@ -277,7 +278,7 @@ def on_item_select(event):
     start_date = safe_value(9)
     try:
         if start_date:
-            entry_employee_startdate.set_date(start_date)  # Set date if valid
+            entry_employee_startdate.set_date(start_date[:10])  # Set date if valid
         else:
             entry_employee_startdate._set_text('')  # Set default if empty
     except Exception as e:
@@ -288,7 +289,7 @@ def on_item_select(event):
     end_date = safe_value(10)
     try:
         if end_date:
-            entry_employee_enddate.set_date(end_date)  # Set date if valid
+            entry_employee_enddate.set_date(end_date[:10])  # Set date if valid
         else:
             entry_employee_enddate._set_text('')  # Set default if empty
     except Exception as e:
@@ -297,11 +298,11 @@ def on_item_select(event):
 
     entry_employee_createdate.config(state="normal")
     entry_employee_createdate.delete(0, tk.END)
-    entry_employee_createdate.insert(0, safe_value(11))
+    entry_employee_createdate.insert(0, safe_value(11)[:10])
     entry_employee_createdate.config(state="readonly")
     entry_employee_modifieddate.config(state="normal")
     entry_employee_modifieddate.delete(0, tk.END)
-    entry_employee_modifieddate.insert(0, safe_value(12))
+    entry_employee_modifieddate.insert(0, safe_value(12)[:10])
     entry_employee_modifieddate.config(state="readonly")
 
 def search_employee():
@@ -341,8 +342,7 @@ def add_employee():
     employee_email = entry_employee_email.get().strip()
     employee_phone = entry_employee_phone.get().strip()
     employee_status = 0
-    created_date = datetime.datetime.now()
-    created_date = created_date.strftime('%Y-%m-%d')  # Convert to string format
+    created_date = datetime.now().strftime('%Y-%m-%d')[:10]  # Convert to string format
     # Fetch and format Start Date
     emp_startdate = entry_employee_startdate.get_date()
     employee_startdate = emp_startdate.strftime('%Y-%m-%d')  # Convert to string format
@@ -389,8 +389,7 @@ def edit_employee():
     employee_lastname = entry_employee_lastname.get().strip()
     employee_email = entry_employee_email.get().strip()
     employee_phone = entry_employee_phone.get().strip()
-    modified_date = datetime.datetime.now()
-    modified_date = modified_date.strftime('%Y-%m-%d')  # Convert to string format
+    modified_date = datetime.now().strftime('%Y-%m-%d')[:10]  # Convert to string format
     selected_department_name = entry_employee_department.get()  # Get selected name
     employee_department = [key for key, value in stored_department_dict.items() if value == selected_department_name][0]  # Get ID
     employee_department = uuid.UUID(employee_department)
