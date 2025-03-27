@@ -10,7 +10,8 @@ from tkcalendar import DateEntry
 def open_employee_screen(root):
     global stored_role_dict,stored_department_dict, frame_employee, entry_employee_code, entry_employee_firstname,\
         entry_employee_lastname,entry_employee_email, tree, selected_item, entry_employee_phone,entry_employee_department,\
-        entry_employee_role,entry_employee_status,entry_employee_startdate,entry_employee_enddate,entry_employee_createdate,entry_employee_modifieddate
+        entry_employee_role,entry_employee_status,entry_employee_startdate,entry_employee_enddate,entry_employee_createdate,\
+        entry_employee_modifieddate, entry_search_code, entry_search_firstname, entry_search_lastname
 
     selected_item = None
     department_dict = get_department_dict()
@@ -21,43 +22,49 @@ def open_employee_screen(root):
     role_names = list(role_dict.values())
     stored_role_dict = role_dict
 
-
     frame_employee = tk.Frame(root, padx=20, pady=20, bd=2, relief="solid", width=1100, height=600, bg="#ecf0f1")
     frame_employee.pack(padx=3, pady=3, fill="both", expand=True)
 
     label_title = tk.Label(frame_employee, text="Employee Management", font=("Arial", 12, "bold"), bg="#ecf0f1")
     label_title.grid(row=0, column=0, columnspan=4, sticky="nw")
 
-    # search_frame = ttk.LabelFrame(frame_employee, text="Details")
-    # search_frame.grid(row=4, column=0, columnspan=10, sticky="nsew", pady=5)
+    search_frame = ttk.LabelFrame(frame_employee, text="Search")
+    search_frame.grid(row=1, column=0, columnspan=10, sticky="nsew", pady=5)
+    search_frame.grid_columnconfigure(0, weight=0)
+    search_frame.grid_columnconfigure(1, weight=0)
+    search_frame.grid_columnconfigure(2, weight=0)
+    search_frame.grid_columnconfigure(3, weight=0)
+    search_frame.grid_columnconfigure(4, weight=0)
+    search_frame.grid_columnconfigure(5, weight=0)
+    search_frame.grid_columnconfigure(6, weight=0)
+    search_frame.grid_columnconfigure(7, weight=1)
+    search_frame.grid_columnconfigure(8, weight=0)
+    search_frame.grid_columnconfigure(9, weight=0)
 
-    label_search_code = tk.Label(frame_employee, text="Code:", font=("Arial", 12), bg="#ecf0f1")
+    label_search_code = tk.Label(search_frame, text="Code:", font=("Arial", 12), bg="#ecf0f1")
     label_search_code.grid(row=1, column=0)
-    entry_search_code = tk.Entry(frame_employee, font=("Arial", 12), relief="groove")
+    entry_search_code = tk.Entry(search_frame, font=("Arial", 12), relief="groove")
     entry_search_code.grid(row=1, column=1)
-    label_search_firstname = tk.Label(frame_employee, text="First Name:", font=("Arial", 12), bg="#ecf0f1")
+    label_search_firstname = tk.Label(search_frame, text="First Name:", font=("Arial", 12), bg="#ecf0f1")
     label_search_firstname.grid(row=1, column=2, )
-    entry_search_firstname = tk.Entry(frame_employee, font=("Arial", 12), relief="groove")
+    entry_search_firstname = tk.Entry(search_frame, font=("Arial", 12), relief="groove")
     entry_search_firstname.grid(row=1, column=3, )
-
-    label_search_lastname = tk.Label(frame_employee, text="Last Name:", font=("Arial", 12), bg="#ecf0f1")
+    label_search_lastname = tk.Label(search_frame, text="Last Name:", font=("Arial", 12), bg="#ecf0f1")
     label_search_lastname.grid(row=1, column=4)
-    entry_search_lastname = tk.Entry(frame_employee, font=("Arial", 12), relief="groove")
+    entry_search_lastname = tk.Entry(search_frame, font=("Arial", 12), relief="groove")
     entry_search_lastname.grid(row=1, column=5)
-    button_search = tk.Button(frame_employee, text="Search", font=("Arial", 12), bg="#27ae60", fg="white", bd=2,
+    button_search = tk.Button(search_frame, text="Search", font=("Arial", 12), bg="#27ae60", fg="white", bd=2,
                               activebackground="blue",
                               activeforeground="white", highlightthickness=7, relief="raised",
                               command=search_employee, cursor="hand2", justify="right", height=1, width=6)
     button_search.grid(row=1, column=8, sticky="e", padx=(0, 5))
-    button_reset = tk.Button(frame_employee, text="Clear", font=("Arial", 12), bg="#27ae60", fg="white", bd=2,
+    button_reset = tk.Button(search_frame, text="Clear", font=("Arial", 12), bg="#27ae60", fg="white", bd=2,
                              activebackground="blue",
                              activeforeground="white", highlightthickness=7, relief="raised", command=reset_fields,
                              cursor="hand2", justify="right", height=1, width=6)
-    button_reset.grid(row=1, column=9, sticky="e")
-
+    button_reset.grid(row=1, column=9, sticky="e", pady=(0,3))
     details_frame = ttk.LabelFrame(frame_employee, text="Details")
     details_frame.grid(row=4, column=0, columnspan=10, sticky="nsew", pady=5)
-
     label_employee_code = tk.Label(details_frame, text="Code:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_code.grid(row=4, column=0, pady=10)
     entry_employee_code = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
@@ -66,29 +73,22 @@ def open_employee_screen(root):
     label_employee_firstname.grid(row=4, column=2, )
     entry_employee_firstname = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
     entry_employee_firstname.grid(row=4, column=3,)
-
     label_employee_lastname = tk.Label(details_frame, text="Last Name:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_lastname.grid(row=4, column=4)
     entry_employee_lastname = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
     entry_employee_lastname.grid(row=4, column=5)
-
-
-
     label_employee_department = tk.Label(details_frame, text="Department:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_department.grid(row=4, column=6)
     entry_employee_department = ttk.Combobox(details_frame, values=department_names, font=("Arial", 12),state="readonly")
     entry_employee_department.grid(row=4, column=7)
-
     label_employee_phone = tk.Label(details_frame, text="Phone:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_phone.grid(row=5, column=0, pady=10)
     entry_employee_phone = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
     entry_employee_phone.grid(row=5, column=1)
-
     label_employee_email = tk.Label(details_frame, text="Email:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_email.grid(row=5, column=2)
     entry_employee_email = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
     entry_employee_email.grid(row=5, column=3)
-
     label_employee_startdate = tk.Label(details_frame, text="Start Date:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_startdate.grid(row=5, column=4)
     entry_employee_startdate = DateEntry(details_frame, width=18, background='darkblue',
@@ -96,33 +96,25 @@ def open_employee_screen(root):
                                          date_pattern='yyyy-MM-dd',relief="groove")  # Format: YYYY-MM-DD
     entry_employee_startdate.grid(row=5, column=5)
     entry_employee_startdate._set_text('')
-
     label_employee_role = tk.Label(details_frame, text="Role:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_role.grid(row=5, column=6)
     entry_employee_role = ttk.Combobox(details_frame, values=role_names, font=("Arial", 12),state="readonly")
     entry_employee_role.grid(row=5, column=7)
-
     label_employee_enddate = tk.Label(details_frame, text="End Date:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_enddate.grid(row=6, column=0, pady=10)
-    # entry_employee_enddate = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
-    # entry_employee_enddate.grid(row=6, column=1)
-
     entry_employee_enddate = DateEntry(details_frame, width=18, background='darkblue',
                                          foreground='white', borderwidth=2, font=("Arial", 12),
                                          date_pattern='yyyy-MM-dd',relief="groove")  # Format: YYYY-MM-DD
     entry_employee_enddate.grid(row=6, column=1)
     entry_employee_enddate._set_text('')
-
     label_employee_createdate = tk.Label(details_frame, text="Created Date:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_createdate.grid(row=6, column=2)
     entry_employee_createdate = tk.Entry(details_frame, font=("Arial", 12), relief="groove", state="readonly")
     entry_employee_createdate.grid(row=6, column=3)
-
     label_employee_modifieddate = tk.Label(details_frame, text="Modified Date:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_modifieddate.grid(row=6, column=4)
     entry_employee_modifieddate = tk.Entry(details_frame, font=("Arial", 12), relief="groove", state="readonly")
     entry_employee_modifieddate.grid(row=6, column=5)
-
     label_employee_status = tk.Label(details_frame, text="Status:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_status.grid(row=6, column=6)
     entry_employee_status = ttk.Combobox(details_frame, values=["Active", "Inactive"], font=("Arial", 12), state="readonly")
@@ -167,10 +159,8 @@ def creatingTreeView():
     tree.heading('Status', text='Status')
     tree.heading('StartDate', text='StartDate')
     tree.heading('EndDate', text='EndDate')
-
     tree.heading('CreatedDate', text='Created Date')
     tree.heading('ModifiedDate', text='Modified Date')
-
     tree.column('Id', width=0, stretch=False)  # Hide the ID column
     tree.column('EmployeeCode', width=150, anchor='center')
     tree.column('FirstName', width=200, anchor='center')
@@ -192,7 +182,7 @@ def creatingTreeView():
     style.configure("Treeview",
                     background="#f9f9f9",
                     foreground="black",
-                    rowheight=28,
+                    rowheight=26,
                     fieldbackground="#f9f9f9")
 
     # Define the style for the Treeview heading
@@ -216,9 +206,7 @@ def creatingTreeView():
     # Horizontal scrollbar
     hsb = ttk.Scrollbar(frame_employee, orient="horizontal", command=tree.xview)
     hsb.grid(row=3, column=0, columnspan=10, sticky='ew')
-
     tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
-
 
     # Grid the Treeview widget
     tree.grid(row=2, column=0, columnspan=10, sticky="nsew", pady=5)
@@ -246,7 +234,6 @@ def creatingTreeView():
     tree.bind("<<TreeviewSelect>>", on_item_select)
     tree.bind("<Double-1>", on_double_click)  # Bind double-click to show full value
 
-
 def on_double_click(event):
     global selected_item
     selected_item = tree.selection()  # Get selected row
@@ -257,7 +244,6 @@ def on_double_click(event):
 
         if 0 <= col_index < len(values):  # Ensure valid index
             messagebox.showinfo("Full Value", values[col_index])  # Show full value
-
 
 def on_item_select(event):
     global selected_item
@@ -273,11 +259,8 @@ def on_item_select(event):
         """Returns an empty string if the value is None or out of range."""
         return values[index] if index < len(values) and values[index] not in [None, "None"] else ""
 
-
-
     entry_employee_code.delete(0, tk.END)
     entry_employee_code.insert(0, safe_value(1))
-
     entry_employee_firstname.delete(0, tk.END)
     entry_employee_firstname.insert(0, safe_value(2))
     entry_employee_lastname.delete(0, tk.END)
@@ -312,7 +295,6 @@ def on_item_select(event):
         print(f"Error setting start date: {e}")
         entry_employee_enddate.set_date('')
 
-
     entry_employee_createdate.config(state="normal")
     entry_employee_createdate.delete(0, tk.END)
     entry_employee_createdate.insert(0, safe_value(11))
@@ -323,16 +305,32 @@ def on_item_select(event):
     entry_employee_modifieddate.config(state="readonly")
 
 def search_employee():
-    search_code = entry_employee_code.get().strip().lower()
-    search_name = entry_employee_firstname.get().strip().lower()
+    # Get search input values
+    code = entry_search_code.get().strip()
+    first_name = entry_search_firstname.get().strip().lower()
+    last_name = entry_search_lastname.get().strip().lower()
 
-    if not search_code and not search_name:
-        reset_fields()
-        return
+    # Fetch all employees with department and role details
+    all_employees = fetch_employees_with_details()
 
-    # Clear previous search results
+    # Apply filtering
+    filtered_employees = []
+    for emp in all_employees:
+        emp_code, emp_first_name, emp_last_name = str(emp[1]), emp[2].lower(), emp[3].lower()
+
+        if (not code or code == emp_code)  and \
+           (not first_name or first_name in emp_first_name) and \
+           (not last_name or last_name in emp_last_name):
+            filtered_employees.append(emp)
+
+    # Clear the Treeview
     for item in tree.get_children():
         tree.delete(item)
+
+    # Insert new data
+    for emp in filtered_employees:
+        tree.insert("", "end", values=emp)
+
 
 def add_employee():
     employee_id = uuid.uuid4()
@@ -348,16 +346,12 @@ def add_employee():
     # Fetch and format Start Date
     emp_startdate = entry_employee_startdate.get_date()
     employee_startdate = emp_startdate.strftime('%Y-%m-%d')  # Convert to string format
-
     # Fetch and format End Date
     emp_enddate = entry_employee_enddate.get_date()
     employee_enddate = emp_enddate.strftime('%Y-%m-%d')  # Convert to string format
-
-
     selected_department_name = entry_employee_department.get()  # Get selected department name
     employee_department = [key for key, value in stored_department_dict.items() if value == selected_department_name][0]  # Get ID
     employee_department = uuid.UUID(employee_department)
-
     selected_role_name = entry_employee_role.get()  # Get selected role name
     employee_role = [key for key, value in stored_role_dict.items() if value == selected_role_name][0]  # Get ID
     employee_role = uuid.UUID(employee_role)
@@ -368,12 +362,10 @@ def add_employee():
 
     try:
         session = get_cassandra_session()
-
         # Check if employee with same code exists
         check_query = "SELECT COUNT(*) FROM employee WHERE EmployeeCode = %s"
         result = session.execute(check_query, (employee_code,))
         count = result.one()[0]
-
         if count > 0:
             messagebox.showwarning("Duplicate Entry", "A employee with this code already exists!")
             return
@@ -383,8 +375,6 @@ def add_employee():
 
         messagebox.showinfo("Success", "Employee added successfully!")
         reset_fields()
-
-
     except Exception as e:
         messagebox.showerror("Error", f"Error adding employee: {str(e)}")
 
@@ -399,14 +389,11 @@ def edit_employee():
     employee_lastname = entry_employee_lastname.get().strip()
     employee_email = entry_employee_email.get().strip()
     employee_phone = entry_employee_phone.get().strip()
-
     modified_date = datetime.datetime.now()
     modified_date = modified_date.strftime('%Y-%m-%d')  # Convert to string format
-
     selected_department_name = entry_employee_department.get()  # Get selected name
     employee_department = [key for key, value in stored_department_dict.items() if value == selected_department_name][0]  # Get ID
     employee_department = uuid.UUID(employee_department)
-
     selected_role_name = entry_employee_role.get()  # Get selected role name
     employee_role = [key for key, value in stored_role_dict.items() if value == selected_role_name][0]  # Get ID
     employee_role = uuid.UUID(employee_role)
@@ -437,12 +424,10 @@ def edit_employee():
     except Exception as e:
         messagebox.showerror("Error", f"Error updating employee: {str(e)}")
 
-
 def fetch_data_from_cassandra():
     session = get_cassandra_session()
     query = "SELECT * FROM employee"
     return sorted(session.execute(query), key=lambda row: row.employeecode)
-
 
 def show_data_on_grid():
     for item in tree.get_children():
@@ -455,24 +440,19 @@ def get_department_dict():
     session = get_cassandra_session()
     query = "SELECT Id, DepartmentName FROM department"
     rows = session.execute(query)
-
     # Create a dictionary {department_id: department_name}
     return {str(row.id): row.departmentname for row in rows}
-
 
 def get_role_dict():
     session = get_cassandra_session()
     query = "SELECT Id, RoleName FROM role"
     rows = session.execute(query)
-
     # Create a dictionary {role_id: role_name}
     return {str(row.id): row.rolename for row in rows}
-
 
 def fetch_employees_with_details():
     session = get_cassandra_session()
     query = "SELECT Id, EmployeeCode, FirstName, LastName, Email, Phone, DepartmentId, RoleId, Status, StartDate, EndDate, CreatedDate, ModifiedDate FROM employee"
-
     rows = session.execute(query)
 
     # Get department and role dictionaries
@@ -490,7 +470,6 @@ def fetch_employees_with_details():
         ))
 
     return employees
-
 
 def get_cassandra_session():
     return CassandraDB().get_session()
@@ -512,7 +491,6 @@ def reset_fields():
     entry_employee_modifieddate.config(state="normal")
     entry_employee_modifieddate.delete(0, tk.END)
     entry_employee_modifieddate.config(state="readonly")
-
     show_data_on_grid()  # Refresh the grid
 
 # Function to Convert Status (0 → "Active", 1 → "Inactive")
