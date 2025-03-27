@@ -28,6 +28,9 @@ def open_employee_screen(root):
     label_title = tk.Label(frame_employee, text="Employee Management", font=("Arial", 12, "bold"), bg="#ecf0f1")
     label_title.grid(row=0, column=0, columnspan=4, sticky="nw")
 
+    # search_frame = ttk.LabelFrame(frame_employee, text="Details")
+    # search_frame.grid(row=4, column=0, columnspan=10, sticky="nsew", pady=5)
+
     label_search_code = tk.Label(frame_employee, text="Code:", font=("Arial", 12), bg="#ecf0f1")
     label_search_code.grid(row=1, column=0)
     entry_search_code = tk.Entry(frame_employee, font=("Arial", 12), relief="groove")
@@ -88,8 +91,6 @@ def open_employee_screen(root):
 
     label_employee_startdate = tk.Label(details_frame, text="Start Date:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_startdate.grid(row=5, column=4)
-
-    # Replace Entry with DateEntry for Start Date
     entry_employee_startdate = DateEntry(details_frame, width=18, background='darkblue',
                                          foreground='white', borderwidth=2, font=("Arial", 12),
                                          date_pattern='yyyy-MM-dd',relief="groove")  # Format: YYYY-MM-DD
@@ -103,8 +104,14 @@ def open_employee_screen(root):
 
     label_employee_enddate = tk.Label(details_frame, text="End Date:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_enddate.grid(row=6, column=0, pady=10)
-    entry_employee_enddate = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
+    # entry_employee_enddate = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
+    # entry_employee_enddate.grid(row=6, column=1)
+
+    entry_employee_enddate = DateEntry(details_frame, width=18, background='darkblue',
+                                         foreground='white', borderwidth=2, font=("Arial", 12),
+                                         date_pattern='yyyy-MM-dd',relief="groove")  # Format: YYYY-MM-DD
     entry_employee_enddate.grid(row=6, column=1)
+    entry_employee_enddate._set_text('')
 
     label_employee_createdate = tk.Label(details_frame, text="Created Date:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_createdate.grid(row=6, column=2)
@@ -140,7 +147,6 @@ def open_employee_screen(root):
     # Function creating treeview
     creatingTreeView()
     return frame_employee
-
 
 def creatingTreeView():
     global tree, frame_employee, selected_item
@@ -283,8 +289,6 @@ def on_item_select(event):
     entry_employee_department.set(safe_value(6))
     entry_employee_role.set(safe_value(7))
     entry_employee_status.set(safe_value(8))
-    # entry_employee_startdate.delete(0, tk.END)
-    # entry_employee_startdate.insert(0, safe_value(9))
 
     # Update DateEntry (Start Date)
     start_date = safe_value(9)
@@ -297,8 +301,18 @@ def on_item_select(event):
         print(f"Error setting start date: {e}")
         entry_employee_startdate.set_date('')
 
-    entry_employee_enddate.delete(0, tk.END)
-    entry_employee_enddate.insert(0, safe_value(10))
+    # Update DateEntry (End Date)
+    end_date = safe_value(10)
+    try:
+        if end_date:
+            entry_employee_enddate.set_date(end_date)  # Set date if valid
+        else:
+            entry_employee_enddate._set_text('')  # Set default if empty
+    except Exception as e:
+        print(f"Error setting start date: {e}")
+        entry_employee_enddate.set_date('')
+
+
     entry_employee_createdate.config(state="normal")
     entry_employee_createdate.delete(0, tk.END)
     entry_employee_createdate.insert(0, safe_value(11))
@@ -330,6 +344,15 @@ def add_employee():
     employee_phone = entry_employee_phone.get().strip()
     employee_status = 0
     created_date = datetime.datetime.now()
+    created_date = created_date.strftime('%Y-%m-%d')  # Convert to string format
+    # Fetch and format Start Date
+    emp_startdate = entry_employee_startdate.get_date()
+    employee_startdate = emp_startdate.strftime('%Y-%m-%d')  # Convert to string format
+
+    # Fetch and format End Date
+    emp_enddate = entry_employee_enddate.get_date()
+    employee_enddate = emp_enddate.strftime('%Y-%m-%d')  # Convert to string format
+
 
     selected_department_name = entry_employee_department.get()  # Get selected department name
     employee_department = [key for key, value in stored_department_dict.items() if value == selected_department_name][0]  # Get ID
@@ -355,8 +378,8 @@ def add_employee():
             messagebox.showwarning("Duplicate Entry", "A employee with this code already exists!")
             return
 
-        insert_query = "INSERT INTO employee (Id, EmployeeCode, FirstName, LastName, Email, Phone, DepartmentId, RoleId, Status, CreatedDate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        session.execute(insert_query, (employee_id, employee_code, employee_firstname, employee_lastname,employee_email, employee_phone,employee_department,employee_role, employee_status, created_date))
+        insert_query = "INSERT INTO employee (Id, EmployeeCode, FirstName, LastName, Email, Phone, DepartmentId, RoleId, Status, StartDate, EndDate, CreatedDate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        session.execute(insert_query, (employee_id, employee_code, employee_firstname, employee_lastname,employee_email, employee_phone,employee_department,employee_role, employee_status,employee_startdate,employee_enddate, created_date))
 
         messagebox.showinfo("Success", "Employee added successfully!")
         reset_fields()
@@ -373,7 +396,12 @@ def edit_employee():
 
     employee_code = entry_employee_code.get().strip()
     employee_firstname = entry_employee_firstname.get().strip()
+    employee_lastname = entry_employee_lastname.get().strip()
+    employee_email = entry_employee_email.get().strip()
+    employee_phone = entry_employee_phone.get().strip()
+
     modified_date = datetime.datetime.now()
+    modified_date = modified_date.strftime('%Y-%m-%d')  # Convert to string format
 
     selected_department_name = entry_employee_department.get()  # Get selected name
     employee_department = [key for key, value in stored_department_dict.items() if value == selected_department_name][0]  # Get ID
@@ -382,10 +410,15 @@ def edit_employee():
     selected_role_name = entry_employee_role.get()  # Get selected role name
     employee_role = [key for key, value in stored_role_dict.items() if value == selected_role_name][0]  # Get ID
     employee_role = uuid.UUID(employee_role)
+    employee_status = get_status_id(entry_employee_status.get().strip())
 
     # Fetch and format Start Date
     emp_startdate = entry_employee_startdate.get_date()
     employee_startdate = emp_startdate.strftime('%Y-%m-%d')  # Convert to string format
+
+    # Fetch and format End Date
+    emp_enddate = entry_employee_enddate.get_date()
+    employee_enddate = emp_enddate.strftime('%Y-%m-%d')  # Convert to string format
 
     if not employee_code or not employee_firstname:
         messagebox.showwarning("Input Error", "Please fill in all fields.")
@@ -395,12 +428,12 @@ def edit_employee():
         employee_id = uuid.UUID(tree.item(selected_item, "values")[0])  # Convert to UUID
 
         session = get_cassandra_session()
-        query = "UPDATE employee SET EmployeeCode = %s, FirstName = %s, DepartmentId = %s, RoleId = %s,StartDate = %s, ModifiedDate = %s WHERE Id = %s"
-        session.execute(query, (employee_code, employee_firstname,employee_department, employee_role,employee_startdate, modified_date, employee_id))
+        query = "UPDATE employee SET EmployeeCode = %s, FirstName = %s, LastName = %s, Email = %s, Phone = %s, DepartmentId = %s, RoleId = %s, Status = %s, StartDate = %s, EndDate = %s, ModifiedDate = %s WHERE Id = %s"
+        session.execute(query, (employee_code, employee_firstname,employee_lastname, employee_email, employee_phone, employee_department, employee_role,employee_status, employee_startdate,employee_enddate, modified_date, employee_id))
 
-        show_data_on_grid()
+        # show_data_on_grid()
         messagebox.showinfo("Success", "Employee updated successfully!")
-
+        reset_fields()
     except Exception as e:
         messagebox.showerror("Error", f"Error updating employee: {str(e)}")
 
@@ -471,6 +504,8 @@ def reset_fields():
     entry_employee_department.set('')
     entry_employee_role.set('')
     entry_employee_status.set('')
+    entry_employee_startdate._set_text('')
+    entry_employee_enddate._set_text('')
     entry_employee_createdate.config(state="normal")
     entry_employee_createdate.delete(0, tk.END)
     entry_employee_createdate.config(state="readonly")
@@ -483,3 +518,7 @@ def reset_fields():
 # Function to Convert Status (0 → "Active", 1 → "Inactive")
 def get_status_text(status):
     return "Active" if status == 0 else "Inactive"
+
+# Function to Convert Status ("Active" → 0, "Inactive" → 1)
+def get_status_id(status):
+    return 1 if status == "Inactive" else 0
