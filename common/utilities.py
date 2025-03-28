@@ -13,8 +13,7 @@ def export_to_excel(tree):
         return
 
     # Convert to Pandas DataFrame
-    column_names = ["Id", "Department Code", "Department Name", "Descriptions", "Created Date", "Modified Date"]
-    df = pd.DataFrame(rows, columns=column_names)
+    df = pd.DataFrame(rows, columns=tree['columns'])
 
     # Ask user for file save location
     file_path = filedialog.asksaveasfilename(defaultextension=".xlsx",
@@ -27,7 +26,7 @@ def export_to_excel(tree):
     try:
         # Save DataFrame to Excel
         with pd.ExcelWriter(file_path, engine="xlsxwriter") as writer:
-            df.to_excel(writer, sheet_name="Departments", index=False)
+            df.to_excel(writer, sheet_name="Data Exported", index=False)
 
         messagebox.showinfo("Success", f"Data exported successfully to {file_path}")
 
