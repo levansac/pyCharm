@@ -346,6 +346,9 @@ def fetch_employees_with_details():
             row.startdate, row.enddate
         ))
 
+    # Sort results manually in Python
+    employees.sort(key=lambda x: (x[3], x[2]),reverse=True)  # EmployeeCode (index 3), ActionDate (index 2)
+
     return employees
 
 def get_cassandra_session():
@@ -366,8 +369,8 @@ def reset_fields():
     entry_employee_department.set('')
     entry_employee_role.set('')
     entry_employee_status.set('')
-    entry_employee_startdate._set_text('')
-    entry_employee_enddate._set_text('')
+    entry_employee_startdate.delete(0, tk.END)
+    entry_employee_enddate.delete(0, tk.END)
     show_data_on_grid()  # Refresh the grid
 
 # Function to Convert Status (0 → "Active", 1 → "Inactive")

@@ -352,6 +352,7 @@ def add_employee():
     employee_phone = entry_employee_phone.get().strip()
     employee_status = 0
     created_date = datetime.now().strftime('%Y-%m-%d')[:10]  # Convert to string format
+    action_date = datetime.now()
     # Fetch and format Start Date
     emp_startdate = entry_employee_startdate.get_date()
     employee_startdate = emp_startdate.strftime('%Y-%m-%d')  # Convert to string format
@@ -382,6 +383,11 @@ def add_employee():
         insert_query = "INSERT INTO employee (Id, EmployeeCode, FirstName, LastName, Email, Phone, DepartmentId, RoleId, Status, StartDate, EndDate, CreatedDate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         session.execute(insert_query, (employee_id, employee_code, employee_firstname, employee_lastname,employee_email, employee_phone,employee_department,employee_role, employee_status,employee_startdate,employee_enddate, created_date))
 
+        #Insert into history table
+        insert_history_query = "INSERT INTO history (Id, Action, ActionDate, EmployeeCode, FirstName, LastName, Email, Phone, DepartmentId, RoleId, Status, StartDate, EndDate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        session.execute(insert_history_query, (employee_id, "INSERT", action_date, employee_code, employee_firstname, employee_lastname,employee_email, employee_phone,employee_department,employee_role, employee_status,employee_startdate,employee_enddate))
+
+
         messagebox.showinfo("Success", "Employee added successfully!")
         reset_fields()
     except Exception as e:
@@ -399,6 +405,7 @@ def edit_employee():
     employee_email = entry_employee_email.get().strip()
     employee_phone = entry_employee_phone.get().strip()
     modified_date = datetime.now().strftime('%Y-%m-%d')[:10]  # Convert to string format
+    action_date = datetime.now()
     selected_department_name = entry_employee_department.get()  # Get selected name
     employee_department = [key for key, value in stored_department_dict.items() if value == selected_department_name][0]  # Get ID
     employee_department = uuid.UUID(employee_department)
@@ -421,10 +428,15 @@ def edit_employee():
 
     try:
         employee_id = uuid.UUID(tree.item(selected_item, "values")[0])  # Convert to UUID
-
+        history_id = uuid.uuid4()
         session = get_cassandra_session()
         query = "UPDATE employee SET EmployeeCode = %s, FirstName = %s, LastName = %s, Email = %s, Phone = %s, DepartmentId = %s, RoleId = %s, Status = %s, StartDate = %s, EndDate = %s, ModifiedDate = %s WHERE Id = %s"
         session.execute(query, (employee_code, employee_firstname,employee_lastname, employee_email, employee_phone, employee_department, employee_role,employee_status, employee_startdate,employee_enddate, modified_date, employee_id))
+
+        #Insert into history table
+        insert_history_query = "INSERT INTO history (Id, Action, ActionDate, EmployeeCode, FirstName, LastName, Email, Phone, DepartmentId, RoleId, Status, StartDate, EndDate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        session.execute(insert_history_query, (history_id, "UPDATE", action_date, employee_code, employee_firstname, employee_lastname,employee_email, employee_phone,employee_department,employee_role, employee_status,employee_startdate,employee_enddate))
+
 
         # show_data_on_grid()
         messagebox.showinfo("Success", "Employee updated successfully!")
