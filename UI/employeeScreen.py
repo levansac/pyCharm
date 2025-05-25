@@ -5,7 +5,7 @@ import uuid
 from connector.cassandra_connection import CassandraDB
 # import datetime
 from datetime import datetime
-from common.utilities import export_to_excel
+from common.utilities import export_to_excel, get_status_text, get_status_id
 from tkcalendar import DateEntry
 
 def open_employee_screen(root):
@@ -15,13 +15,19 @@ def open_employee_screen(root):
         entry_employee_modifieddate, entry_search_code, entry_search_firstname, entry_search_lastname, entry_search_status
 
     selected_item = None
-    department_dict = get_department_dict()
+    # Get only active departments
+    department_dict = get_department_dict(True)
     department_names = list(department_dict.values())
-    stored_department_dict = department_dict
 
-    role_dict = get_role_dict()
+    # Get all department
+    stored_department_dict = get_department_dict()
+
+    # Get only active roles
+    role_dict = get_role_dict(True)
     role_names = list(role_dict.values())
-    stored_role_dict = role_dict
+
+    # Get all role
+    stored_role_dict = get_role_dict()
 
     frame_employee = tk.Frame(root, padx=20, pady=20, bd=2, relief="solid", width=1100, height=600, bg="#ecf0f1")
     frame_employee.pack(padx=3, pady=3, fill="both", expand=True)
@@ -451,16 +457,22 @@ def show_data_on_grid():
     for employee in fetch_employees_with_details():
         tree.insert('', 'end', values=employee)
 
-def get_department_dict():
+def get_department_dict(only_active=False):
     session = get_cassandra_session()
-    query = "SELECT Id, DepartmentName FROM department"
+    if only_active:
+        query = "SELECT Id, DepartmentName FROM department WHERE Status = 0 ALLOW FILTERING"
+    else:
+        query = "SELECT Id, DepartmentName FROM department"
     rows = session.execute(query)
     # Create a dictionary {department_id: department_name}
     return {str(row.id): row.departmentname for row in rows}
 
-def get_role_dict():
+def get_role_dict(only_active=False):
     session = get_cassandra_session()
-    query = "SELECT Id, RoleName FROM role"
+    if only_active:
+        query = "SELECT Id, RoleName FROM role WHERE Status = 0 ALLOW FILTERING"
+    else:
+        query = "SELECT Id, RoleName FROM role"
     rows = session.execute(query)
     # Create a dictionary {role_id: role_name}
     return {str(row.id): row.rolename for row in rows}
@@ -511,11 +523,3 @@ def reset_fields():
     entry_employee_modifieddate.delete(0, tk.END)
     entry_employee_modifieddate.config(state="readonly")
     show_data_on_grid()  # Refresh the grid
-
-# Function to Convert Status (0 → "Active", 1 → "Inactive")
-def get_status_text(status):
-    return "Active" if status == 0 else "Inactive"
-
-# Function to Convert Status ("Active" → 0, "Inactive" → 1)
-def get_status_id(status):
-    return 1 if status == "Inactive" else 0
