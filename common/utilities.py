@@ -32,3 +32,11 @@ def export_to_excel(tree):
 
     except Exception as e:
         messagebox.showerror("Export Error", f"Failed to export data: {str(e)}")
+
+# Function to Convert Status (0 → "Active", 1 → "Inactive")
+def get_status_text(status):
+    return "Active" if status == 0 else "Inactive"
+
+# Function to Convert Status ("Active" → 0, "Inactive" → 1)
+def get_status_id(status):
+    return 1 if status == "Inactive" else 0
