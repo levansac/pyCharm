@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  cassandra-seed:
+    image: cassandra:latest
+    container_name: cassandra-seed
+    networks:
+      - cassandra-net
+    environment:
+      CASSANDRA_CLUSTER_NAME: "TestCluster"
+      CASSANDRA_DC: "dc1"
+      CASSANDRA_RACK: "rack1"
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra-seed-data:/var/lib/cassandra
+
+  cassandra-node1:
+    image: cassandra:latest
+    container_name: cassandra-node1
+    depends_on:
+      - cassandra-seed
+    networks:
+      - cassandra-net
+    environment:
+      CASSANDRA_SEEDS: "cassandra-seed"
+      CASSANDRA_CLUSTER_NAME: "TestCluster"
+      CASSANDRA_DC: "dc1"
+      CASSANDRA_RACK: "rack1"
+    volumes:
+      - cassandra-node1-data:/var/lib/cassandra
+
+  cassandra-node2:
+    image: cassandra:latest
+    container_name: cassandra-node2
+    depends_on:
+      - cassandra-seed
+    networks:
+      - cassandra-net
+    environment:
+      CASSANDRA_SEEDS: "cassandra-seed"
+      CASSANDRA_CLUSTER_NAME: "TestCluster"
+      CASSANDRA_DC: "dc1"
+      CASSANDRA_RACK: "rack1"
+    volumes:
+      - cassandra-node2-data:/var/lib/cassandra
+
+networks:
+  cassandra-net:
+
+volumes:
+  cassandra-seed-data:
+  cassandra-node1-data:
+  cassandra-node2-data:

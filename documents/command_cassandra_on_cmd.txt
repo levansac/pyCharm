@@ -1,22 +1,15 @@
-DESCRIBE KEYSPACES;
-DESCRIBE TABLES;
-use cassandrakeyspace;
+--Create and run yml file to host casandra on docker
+create file docker-compose.yml
+run : docker-compose up -d
 
 --open nodetool
-docker exec -it cassandra /bin/bash
+docker exec -it cassandra-seed bash
 nodetool status
 nodetool info
 nodetool describecluster
 
-
 --open cqlsh
-docker exec -it cassandra cqlsh
+docker exec -it cassandra-seed cqlsh
 use cassandrakeyspace;
-
-
-
---
- truncate table employee;
- truncate table department;
- truncate table role;
- truncate table history;
+DESCRIBE KEYSPACES;
+DESCRIBE TABLES;
