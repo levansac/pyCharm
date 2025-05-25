@@ -19,3 +19,18 @@ II, Install libraries on python
         open terminal on pycharm (Alt F12): pip install XlsxWriter
     4, install datetimePicker
         open terminal on pycharm (Alt F12): pip install tkcalendar
+    5, install faker to fake seed data
+        open terminal on pycharm (Alt F12): pip install faker
+
+III, Create DB, table, seeding data (using CMD)
+    1, Creating KeySpace
+        using CMD to run file database_script\keySpace.cql
+    2, Creating Role table and inserting seeding data
+        using CMD to run file database_script\role.cql
+    3, Creating Department table and inserting seeding data
+        using CMD to run file database_script\department.cql
+    4, Creating Employee table
+        using CMD to run file database_script\employee.cql
+    5, Inserting seeding data for employee table
+        on Pycharm, run file connector\seeding_data_employee_table.py
+

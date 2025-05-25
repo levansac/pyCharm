@@ -5,11 +5,11 @@ import uuid
 from cassandra.cluster import Cluster
 from connector.cassandra_connection import CassandraDB
 import datetime
-from common.utilities import export_to_excel
+from common.utilities import export_to_excel, get_status_text, get_status_id
 
 
 def open_role_screen(root):
-    global frame_role, entry_role_code, entry_role_name, entry_description, tree, selected_item
+    global frame_role, entry_role_code, entry_role_name, entry_description, tree, selected_item,entry_role_status
 
     selected_item = None
 
@@ -22,11 +22,19 @@ def open_role_screen(root):
     label_role_code = tk.Label(frame_role, text="Code:", font=("Arial", 12), bg="#ecf0f1")
     label_role_code.grid(row=1, column=0, sticky="w")
     entry_role_code = tk.Entry(frame_role, font=("Arial", 12), relief="groove")
-    entry_role_code.grid(row=1,column=1, columnspan=2, sticky="w")
+    entry_role_code.grid(row=1,column=1, columnspan=1, sticky="w")
     label_role_name = tk.Label(frame_role, text="Name:", font=("Arial", 12), bg="#ecf0f1")
-    label_role_name.grid(row=1, column=3,sticky="e")
+    label_role_name.grid(row=1, column=2,sticky="e")
     entry_role_name = tk.Entry(frame_role, font=("Arial", 12), relief="groove")
-    entry_role_name.grid(row=1, column=4,columnspan=3, sticky="ew")
+    entry_role_name.grid(row=1, column=3,columnspan=2, sticky="ew")
+
+    label_role_status = tk.Label(frame_role, text="Status:", font=("Arial", 12), bg="#ecf0f1")
+    label_role_status.grid(row=1, column=5, sticky="w")
+    entry_role_status = ttk.Combobox(frame_role, values=["Active", "Inactive"], font=("Arial", 12),
+                                       state="readonly")
+    entry_role_status.grid(row=1, column=6, pady=0)
+
+
     button_search = tk.Button(frame_role, text="Search", font=("Arial", 12), bg="#27ae60", fg="white", bd=2, activebackground="blue",
                    activeforeground="white", highlightthickness=7, relief="raised", command=search_role, cursor="hand2", justify="right",height=1,  width=6)
     button_search.grid(row=1,column=7,sticky="e", padx=(0,5))
@@ -38,6 +46,13 @@ def open_role_screen(root):
     label_description.grid(row=2, column=0, sticky="w")
     entry_description = tk.Entry(frame_role, font=("Arial", 12), relief="groove")
     entry_description.grid(row=2, column=1, columnspan=6, sticky="ew")
+
+    # label_search_status = tk.Label(frame_role, text="Status:", font=("Arial", 12), bg="#ecf0f1")
+    # label_search_status.grid(row=2, column=7, sticky="w")
+    # entry_search_status = ttk.Combobox(frame_role, values=["Active", "Inactive"], font=("Arial", 12),
+    #                                    state="readonly")
+    # entry_search_status.grid(row=2, column=7, pady=0)
+
     button_add = tk.Button(frame_role, text="Add", font=("Arial", 12), bg="#27ae60", fg="white", bd=2, activebackground="blue",
                    activeforeground="white", highlightthickness=7, relief="raised", command=add_role, cursor="hand2", justify="right",height=1,  width=6)
     button_add.grid(row=2, column=8, sticky="e", pady=(5,0))
@@ -46,15 +61,14 @@ def open_role_screen(root):
                               activebackground="blue",
                               activeforeground="white", highlightthickness=7, relief="raised", cursor="hand2",
                               justify="right", command=lambda: export_to_excel(tree), height=1, width=6)
-    button_export.grid(row=4, column=6, sticky="e", padx=(0, 5))
+    button_export.grid(row=4, column=7, sticky="e", padx=(0, 5))
 
-    # Button Edit
-    button_edit = tk.Button(frame_role, text="Edit", font=("Arial", 12), bg="#efc497", fg="white", bd=2, activebackground="blue",
+    button_edit = tk.Button(frame_role, text="Update", font=("Arial", 12), bg="#efc497", fg="white", bd=2, activebackground="blue",
                    activeforeground="white", highlightthickness=7, relief="raised", cursor="hand2", justify="right", command=edit_role, height=1,  width=6)
-    button_edit.grid(row=4, column=7, sticky="e", padx=(0,5))
-    button_delete = tk.Button(frame_role, text="Delete", font=("Arial", 12), bg="#f3a0a0", fg="white", bd=2, activebackground="blue",
-                   activeforeground="white", highlightthickness=7, relief="raised", cursor="hand2", justify="right", command=delete_role, height=1,  width=6)
-    button_delete.grid(row=4, column=8, sticky="e")
+    button_edit.grid(row=4, column=8, sticky="e")
+    # button_delete = tk.Button(frame_role, text="Delete", font=("Arial", 12), bg="#f3a0a0", fg="white", bd=2, activebackground="blue",
+    #                activeforeground="white", highlightthickness=7, relief="raised", cursor="hand2", justify="right", command=delete_role, height=1,  width=6)
+    # button_delete.grid(row=4, column=8, sticky="e")
 
     # Function creating treeview
     creatingTreeView()
@@ -65,11 +79,13 @@ def creatingTreeView():
     global tree, frame_role, selected_item
     # Create Treeview widget (Grid/Table)
     tree = ttk.Treeview(frame_role, show="headings", height=17)
-    tree['columns'] = ('Id', 'RoleCode', 'RoleName', 'Descriptions', 'CreatedDate', 'ModifiedDate')
+    tree['columns'] = ('Id', 'RoleCode', 'RoleName', 'Status', 'Descriptions', 'CreatedDate', 'ModifiedDate')
 
     tree.heading('Id', text='Id')  # Hidden column
     tree.heading('RoleCode', text='Code')
     tree.heading('RoleName', text='Name')
+    tree.heading('Status', text='Status')
+
     tree.heading('Descriptions', text='Descriptions')
     tree.heading('CreatedDate', text='Created Date')
     tree.heading('ModifiedDate', text='Modified Date')
@@ -77,6 +93,7 @@ def creatingTreeView():
     tree.column('Id', width=0, stretch=False)  # Hide the ID column
     tree.column('RoleCode', width=100, anchor='center')
     tree.column('RoleName', width=200, anchor='center')
+    tree.column('Status', width=100, anchor='center')
     tree.column('Descriptions', width=300, anchor='center')
     tree.column('CreatedDate', width=100, anchor='center')
     tree.column('ModifiedDate', width=100, anchor='center')
@@ -118,11 +135,11 @@ def creatingTreeView():
     frame_role.grid_rowconfigure(1, weight=0)
     frame_role.grid_rowconfigure(2, weight=0)
     frame_role.grid_columnconfigure(0, weight=0)
-    frame_role.grid_columnconfigure(1, weight=1)
+    frame_role.grid_columnconfigure(1, weight=0)
     frame_role.grid_columnconfigure(2, weight=0)
     frame_role.grid_columnconfigure(3, weight=0)
     frame_role.grid_columnconfigure(4, weight=0)
-    frame_role.grid_columnconfigure(5, weight=1)
+    frame_role.grid_columnconfigure(5, weight=0)
     frame_role.grid_columnconfigure(6, weight=0)
     frame_role.grid_columnconfigure(7, weight=1)
     frame_role.grid_columnconfigure(8, weight=0)
@@ -152,32 +169,57 @@ def on_item_select(event):
     selected_item = selected_items[0]
     values = tree.item(selected_item, "values")
 
+    def safe_value(index):
+        """Returns an empty string if the value is None or out of range."""
+        return values[index] if index < len(values) and values[index] not in [None, "None"] else ""
+
     entry_role_code.delete(0, tk.END)
-    entry_role_code.insert(0, values[1])
+    entry_role_code.insert(0, safe_value(1))
 
     entry_role_name.delete(0, tk.END)
-    entry_role_name.insert(0, values[2])
+    entry_role_name.insert(0, safe_value(2))
+    entry_role_status.set(safe_value(3))
 
     entry_description.delete(0, tk.END)
-    entry_description.insert(0, values[3])
+    entry_description.insert(0, safe_value(4))
 
 def search_role():
     search_code = entry_role_code.get().strip().lower()
     search_name = entry_role_name.get().strip().lower()
+    search_status_text = entry_role_status.get().strip()
 
-    if not search_code and not search_name:
+    # If no criteria, show all
+    if not search_code and not search_name and not search_status_text:
         reset_fields()
         return
 
-    # Clear previous search results
+    # Clear previous results
     for item in tree.get_children():
         tree.delete(item)
 
+    # Convert status text to ID (0 or 1)
+    search_status_id = get_status_id(search_status_text) if search_status_text else None
+
     try:
         for row in fetch_data_from_cassandra():
-            if (search_code and search_code in row.rolecode.lower()) or \
-               (search_name and search_name in row.rolename.lower()):
-                tree.insert('', 'end', values=(str(row.id), row.rolecode, row.rolename, row.descriptions, row.createddate, row.modifieddate))
+            # Lowercase for string matching
+            role_code_lower = row.rolecode.lower() if row.rolecode else ""
+            role_name_lower = row.rolename.lower() if row.rolename else ""
+
+            # Check conditions
+            code_match = search_code in role_code_lower if search_code else True
+            name_match = search_name in role_name_lower if search_name else True
+            status_match = (row.status == search_status_id) if search_status_id is not None else True
+
+            if code_match and name_match and status_match:
+                tree.insert('', 'end', values=(
+                    str(row.id),
+                    row.rolecode,
+                    row.rolename,
+                    get_status_text(row.status),
+                    row.descriptions,
+                    row.createddate,
+                    row.modifieddate))
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
@@ -186,6 +228,7 @@ def add_role():
     role_id = uuid.uuid4()
     role_code = entry_role_code.get().strip()
     role_name = entry_role_name.get().strip()
+    role_status = 0
     description = entry_description.get().strip()
     created_date = datetime.datetime.now()
 
@@ -205,16 +248,16 @@ def add_role():
             messagebox.showwarning("Duplicate Entry", "A role with this code already exists!")
             return
 
-        insert_query = "INSERT INTO role (Id, RoleCode, RoleName, Descriptions) VALUES (%s, %s, %s, %s, %s)"
-        session.execute(insert_query, (role_id, role_code, role_name, description,created_date))
+        insert_query = "INSERT INTO role (Id, RoleCode, RoleName, Status, Descriptions,CreatedDate) VALUES (%s, %s,%s, %s, %s, %s)"
+        session.execute(insert_query, (role_id, role_code, role_name,role_status, description,created_date))
 
-        entry_role_code.delete(0, tk.END)
-        entry_role_name.delete(0, tk.END)
-        entry_description.delete(0, tk.END)
-
-        showDataOnGrid()
+        # entry_role_code.delete(0, tk.END)
+        # entry_role_name.delete(0, tk.END)
+        # entry_description.delete(0, tk.END)
+        #
+        # showDataOnGrid()
         messagebox.showinfo("Success", "Role added successfully!")
-
+        reset_fields()
     except Exception as e:
         messagebox.showerror("Error", f"Error adding role: {str(e)}")
 
@@ -248,6 +291,7 @@ def edit_role():
 
     role_code = entry_role_code.get().strip()
     role_name = entry_role_name.get().strip()
+    role_status = get_status_id(entry_role_status.get().strip())
     description = entry_description.get().strip()
     modified_date = datetime.datetime.now()
 
@@ -259,8 +303,8 @@ def edit_role():
         role_id = uuid.UUID(tree.item(selected_item, "values")[0])  # Convert to UUID
 
         session = get_cassandra_session()
-        query = "UPDATE role SET RoleCode = %s, RoleName = %s, Descriptions = %s, ModifiedDate = %s WHERE Id = %s"
-        session.execute(query, (role_code, role_name, description, modified_date, role_id))
+        query = "UPDATE role SET RoleCode = %s, RoleName = %s, Status = %s, Descriptions = %s, ModifiedDate = %s WHERE Id = %s"
+        session.execute(query, (role_code, role_name, role_status, description, modified_date, role_id))
 
         showDataOnGrid()
         messagebox.showinfo("Success", "Role updated successfully!")
@@ -280,7 +324,7 @@ def showDataOnGrid():
         tree.delete(item)
 
     for row in fetch_data_from_cassandra():
-        tree.insert('', 'end', values=(str(row.id), row.rolecode, row.rolename, row.descriptions, row.createddate, row.modifieddate))
+        tree.insert('', 'end', values=(str(row.id), row.rolecode, row.rolename, get_status_text(row.status),row.descriptions, row.createddate, row.modifieddate))
 
 
 def get_cassandra_session():
@@ -289,5 +333,6 @@ def get_cassandra_session():
 def reset_fields():
     entry_role_code.delete(0, tk.END)
     entry_role_name.delete(0, tk.END)
+    entry_role_status.set('')
     entry_description.delete(0, tk.END)
     showDataOnGrid()  # Refresh the grid

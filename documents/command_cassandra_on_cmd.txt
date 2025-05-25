@@ -11,3 +11,12 @@ nodetool describecluster
 
 --open cqlsh
 docker exec -it cassandra cqlsh
+use cassandrakeyspace;
+
+
+
+--
+ truncate table employee;
+ truncate table department;
+ truncate table role;
+ truncate table history;
