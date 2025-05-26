@@ -154,7 +154,7 @@ def open_employee_screen(root):
                               activeforeground="white", highlightthickness=7, relief="raised", cursor="hand2",
                               justify="right", command=lambda: export_to_excel(tree), height=1, width=6)
     button_export.grid(row=7, column=7, sticky="e",padx=(0, 5), pady=5)
-    button_edit = tk.Button(frame_employee, text="Edit", font=("Arial", 12), bg="#efc497", fg="white", bd=2,
+    button_edit = tk.Button(frame_employee, text="Update", font=("Arial", 12), bg="#efc497", fg="white", bd=2,
                             activebackground="blue",
                             activeforeground="white", highlightthickness=7, relief="raised", cursor="hand2",
                             justify="right", command=edit_employee, height=1, width=6)
