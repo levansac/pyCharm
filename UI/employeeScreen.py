@@ -6,6 +6,7 @@ from connector.cassandra_connection import CassandraDB
 # import datetime
 from datetime import datetime
 from common.utilities import export_to_excel, get_status_text, get_status_id
+
 from tkcalendar import DateEntry
 
 def open_employee_screen(root):
@@ -52,10 +53,12 @@ def open_employee_screen(root):
     label_search_code.grid(row=1, column=0)
     entry_search_code = tk.Entry(search_frame, font=("Arial", 12), relief="groove")
     entry_search_code.grid(row=1, column=1)
+
     label_search_firstname = tk.Label(search_frame, text="First Name:", font=("Arial", 12), bg="#ecf0f1")
     label_search_firstname.grid(row=1, column=2, )
     entry_search_firstname = tk.Entry(search_frame, font=("Arial", 12), relief="groove")
     entry_search_firstname.grid(row=1, column=3, )
+
     label_search_lastname = tk.Label(search_frame, text="Last Name:", font=("Arial", 12), bg="#ecf0f1")
     label_search_lastname.grid(row=1, column=4)
     entry_search_lastname = tk.Entry(search_frame, font=("Arial", 12), relief="groove")
@@ -79,56 +82,68 @@ def open_employee_screen(root):
     button_reset.grid(row=1, column=9, sticky="e", pady=(0,3))
     details_frame = ttk.LabelFrame(frame_employee, text="Details")
     details_frame.grid(row=4, column=0, columnspan=10, sticky="nsew", pady=5)
-    label_employee_code = tk.Label(details_frame, text="Code:", font=("Arial", 12), bg="#ecf0f1")
-    label_employee_code.grid(row=4, column=0, pady=10)
-    entry_employee_code = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
-    entry_employee_code.grid(row=4, column=1)
-    label_employee_firstname = tk.Label(details_frame, text="First Name:", font=("Arial", 12), bg="#ecf0f1")
-    label_employee_firstname.grid(row=4, column=2, )
-    entry_employee_firstname = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
-    entry_employee_firstname.grid(row=4, column=3,)
-    label_employee_lastname = tk.Label(details_frame, text="Last Name:", font=("Arial", 12), bg="#ecf0f1")
-    label_employee_lastname.grid(row=4, column=4)
-    entry_employee_lastname = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
-    entry_employee_lastname.grid(row=4, column=5)
+
+    label_employee_startdate = tk.Label(details_frame, text="Start Date:", font=("Arial", 12), bg="#ecf0f1")
+    label_employee_startdate.grid(row=4, column=0, pady=10)
+    entry_employee_startdate = DateEntry(details_frame, width=18, background='darkblue',
+                                         foreground='white', borderwidth=2, font=("Arial", 12),
+                                         date_pattern='yyyy-MM-dd',relief="groove")  # Format: YYYY-MM-DD
+    entry_employee_startdate.grid(row=4, column=1)
+    entry_employee_startdate._set_text('')
+
+    label_employee_enddate = tk.Label(details_frame, text="End Date:", font=("Arial", 12), bg="#ecf0f1")
+    label_employee_enddate.grid(row=4, column=2, )
+    entry_employee_enddate = DateEntry(details_frame, width=18, background='darkblue',
+                                         foreground='white', borderwidth=2, font=("Arial", 12),
+                                         date_pattern='yyyy-MM-dd',relief="groove")  # Format: YYYY-MM-DD
+    entry_employee_enddate.grid(row=4, column=3,)
+    entry_employee_enddate._set_text('')
+
+    label_employee_email = tk.Label(details_frame, text="Email:", font=("Arial", 12), bg="#ecf0f1")
+    label_employee_email.grid(row=4, column=4)
+    entry_employee_email = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
+    entry_employee_email.grid(row=4, column=5)
+
     label_employee_department = tk.Label(details_frame, text="Department:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_department.grid(row=4, column=6)
     entry_employee_department = ttk.Combobox(details_frame, values=department_names, font=("Arial", 12),state="readonly")
     entry_employee_department.grid(row=4, column=7)
-    label_employee_phone = tk.Label(details_frame, text="Phone:", font=("Arial", 12), bg="#ecf0f1")
-    label_employee_phone.grid(row=5, column=0, pady=10)
-    entry_employee_phone = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
-    entry_employee_phone.grid(row=5, column=1)
-    label_employee_email = tk.Label(details_frame, text="Email:", font=("Arial", 12), bg="#ecf0f1")
-    label_employee_email.grid(row=5, column=2)
-    entry_employee_email = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
-    entry_employee_email.grid(row=5, column=3)
-    label_employee_startdate = tk.Label(details_frame, text="Start Date:", font=("Arial", 12), bg="#ecf0f1")
-    label_employee_startdate.grid(row=5, column=4)
-    entry_employee_startdate = DateEntry(details_frame, width=18, background='darkblue',
-                                         foreground='white', borderwidth=2, font=("Arial", 12),
-                                         date_pattern='yyyy-MM-dd',relief="groove")  # Format: YYYY-MM-DD
-    entry_employee_startdate.grid(row=5, column=5)
-    entry_employee_startdate._set_text('')
+
+    label_employee_code = tk.Label(details_frame, text="Code:", font=("Arial", 12), bg="#ecf0f1")
+    label_employee_code.grid(row=5, column=0, pady=10)
+    entry_employee_code = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
+    entry_employee_code.grid(row=5, column=1)
+
+    label_employee_firstname = tk.Label(details_frame, text="First Name:", font=("Arial", 12), bg="#ecf0f1")
+    label_employee_firstname.grid(row=5, column=2)
+    entry_employee_firstname = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
+    entry_employee_firstname.grid(row=5, column=3)
+
+    label_employee_lastname = tk.Label(details_frame, text="Last Name:", font=("Arial", 12), bg="#ecf0f1")
+    label_employee_lastname.grid(row=5, column=4)
+    entry_employee_lastname = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
+    entry_employee_lastname.grid(row=5, column=5)
+
     label_employee_role = tk.Label(details_frame, text="Role:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_role.grid(row=5, column=6)
     entry_employee_role = ttk.Combobox(details_frame, values=role_names, font=("Arial", 12),state="readonly")
     entry_employee_role.grid(row=5, column=7)
-    label_employee_enddate = tk.Label(details_frame, text="End Date:", font=("Arial", 12), bg="#ecf0f1")
-    label_employee_enddate.grid(row=6, column=0, pady=10)
-    entry_employee_enddate = DateEntry(details_frame, width=18, background='darkblue',
-                                         foreground='white', borderwidth=2, font=("Arial", 12),
-                                         date_pattern='yyyy-MM-dd',relief="groove")  # Format: YYYY-MM-DD
-    entry_employee_enddate.grid(row=6, column=1)
-    entry_employee_enddate._set_text('')
+
+    label_employee_phone = tk.Label(details_frame, text="Phone:", font=("Arial", 12), bg="#ecf0f1")
+    label_employee_phone.grid(row=6, column=0, pady=10)
+    entry_employee_phone = tk.Entry(details_frame, font=("Arial", 12), relief="groove")
+    entry_employee_phone.grid(row=6, column=1)
+
     label_employee_createdate = tk.Label(details_frame, text="Created Date:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_createdate.grid(row=6, column=2)
     entry_employee_createdate = tk.Entry(details_frame, font=("Arial", 12), relief="groove", state="readonly")
     entry_employee_createdate.grid(row=6, column=3)
+
     label_employee_modifieddate = tk.Label(details_frame, text="Modified Date:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_modifieddate.grid(row=6, column=4)
     entry_employee_modifieddate = tk.Entry(details_frame, font=("Arial", 12), relief="groove", state="readonly")
     entry_employee_modifieddate.grid(row=6, column=5)
+
     label_employee_status = tk.Label(details_frame, text="Status:", font=("Arial", 12), bg="#ecf0f1")
     label_employee_status.grid(row=6, column=6)
     entry_employee_status = ttk.Combobox(details_frame, values=["Active", "Inactive"], font=("Arial", 12), state="readonly")
