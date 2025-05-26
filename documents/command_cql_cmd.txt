@@ -1,6 +1,6 @@
 --Create and run yml file to host casandra on docker
-create file docker-compose.yml
-run : docker-compose up -d
+cd to folder file docker-compose.yml
+open cmd run : docker-compose up -d
 
 --open nodetool
 docker exec -it cassandra-seed bash
