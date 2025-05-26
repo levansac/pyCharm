@@ -1,13 +1,12 @@
 0, Install python (v3.11), pycharm
 
 I, Setup environment
-    1, Install docker
+    1, Install docker (v.4.38.0)
         https://docs.docker.com/desktop/setup/install/windows-install/
     2, Pull Cassandra Docker Image
-        cd to folder file docker-compose.yml
+        cd to folder file ..\documents\docker-compose.yml
         open cmd run : docker-compose up -d
-    3, Run a cassandra container
-        open cmd run: docker run --name cassandra -d -p 9042:9042 cassandra:latest
+    3, Start container cassandra-seed on docker
     4, Connect to cassandra on cmd
         open cmd run: docker exec -it cassandra-seed cqlsh
 
@@ -38,5 +37,13 @@ III, Create DB, table, seeding data (using CMD)
         using CMD to run file database_script\history.cql
     6, Inserting seeding data for employee table
         on Pycharm, run file connector\seeding_data_employee_table.py
-
+IV, Using Nodetool to manage, setup, monitor DB
+    1, connect to Nodetool
+        using CMD to run: docker exec -it cassandra-seed bash
+    2, check status
+        using CMD to run: nodetool status
+    3, check information
+        using CMD to run: nodetool info
+    4, check cluster
+        using CMD to run: nodetool describecluster
 
