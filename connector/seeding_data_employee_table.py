@@ -35,7 +35,7 @@ INSERT INTO {EMPLOYEE_TABLE} (
 ''')
 
 # Step 4: Insert 1000 fake employees
-for _ in range(1000):
+for _ in range(3000):
     emp_id = uuid.uuid4()
     emp_code = f"EMP{random.randint(10000, 99999)}"
     first_name = fake.first_name()

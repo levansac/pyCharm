@@ -13,3 +13,5 @@ docker exec -it cassandra-seed cqlsh
 use cassandrakeyspace;
 DESCRIBE KEYSPACES;
 DESCRIBE TABLES;
+select * from employee LIMIT 5;
+select * from employee where LastName='van' ALLOW FILTERING;
